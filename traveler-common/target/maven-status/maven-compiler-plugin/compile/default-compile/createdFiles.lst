@@ -1,0 +1,3 @@
+com\traveler\common\dto\TripDto.class
+com\traveler\common\entity\Trip.class
+com\traveler\common\entity\Booking.class

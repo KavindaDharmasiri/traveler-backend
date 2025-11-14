@@ -39,12 +39,12 @@
 
 
     <modules>
+        <module>traveler-common</module>
         <module>traveler-config</module>
         <module>traveler-gateway</module>
         <module>traveler-discovery</module>
         <module>traveler-auth</module>
         <module>traveler-storage</module>
-        <module>traveler-tenant</module>
         <module>traveler-core</module>
     </modules>
 

@@ -6,10 +6,13 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="traveler-tenant" />
         <module name="traveler-discovery" />
         <module name="traveler (1) (com.traveler.auth)" />
         <module name="traveler-config" />
         <module name="traveler-storage" />
+        <module name="traveler-core" />
+        <module name="traveler-common" />
         <module name="traveler-gateway" />
       </profile>
     </annotationProcessing>
@@ -18,9 +21,11 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="traveler (1) (com.traveler.auth)" options="-parameters" />
       <module name="traveler-config" options="-parameters" />
+      <module name="traveler-core" options="-parameters" />
       <module name="traveler-discovery" options="-parameters" />
       <module name="traveler-gateway" options="-parameters" />
       <module name="traveler-storage" options="-parameters" />
+      <module name="traveler-tenant" options="-parameters" />
     </option>
   </component>
 </project>
