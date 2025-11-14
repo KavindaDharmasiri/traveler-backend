@@ -2,22 +2,24 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="traveler-discovery" />
+        <module name="traveler-config" />
+        <module name="traveler-storage" />
+        <module name="traveler-gateway" />
+      </profile>
       <profile name="Annotation profile for traveler" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
         </processorPath>
         <module name="traveler (1) (com.traveler.auth)" />
-      </profile>
-      <profile name="Maven default annotation processors profile" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <module name="traveler-discovery" />
-        <module name="traveler-gateway" />
-        <module name="traveler-config" />
       </profile>
     </annotationProcessing>
   </component>
@@ -27,6 +29,7 @@
       <module name="traveler-config" options="-parameters" />
       <module name="traveler-discovery" options="-parameters" />
       <module name="traveler-gateway" options="-parameters" />
+      <module name="traveler-storage" options="-parameters" />
     </option>
   </component>
 </project>

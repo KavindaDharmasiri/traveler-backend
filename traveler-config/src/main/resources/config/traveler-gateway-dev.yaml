@@ -8,6 +8,12 @@ spring:
             - Path=/auth/**
           filters:
             - StripPrefix=1
+        - id: traveler-storage
+          uri: lb://traveler-storage
+          predicates:
+            - Path=/storage/**
+          filters:
+            - StripPrefix=1
       discovery:
         locator:
           enabled: true

@@ -43,6 +43,7 @@
         <module>traveler-gateway</module>
         <module>traveler-discovery</module>
         <module>traveler-auth</module>
+        <module>traveler-storage</module>
     </modules>
 
 
