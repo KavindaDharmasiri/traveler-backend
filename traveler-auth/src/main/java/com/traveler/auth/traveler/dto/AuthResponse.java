@@ -1,0 +1,13 @@
+package com.traveler.auth.traveler.dto;
+
+import lombok.Data;
+
+@Data
+public class AuthResponse {
+    private String accessToken;
+    private String refreshToken;
+    private String tokenType = "Bearer";
+    private Long userId;
+    private String email;
+    private String name;
+}

@@ -7,19 +7,10 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="traveler-discovery" />
+        <module name="traveler (1) (com.traveler.auth)" />
         <module name="traveler-config" />
         <module name="traveler-storage" />
         <module name="traveler-gateway" />
-      </profile>
-      <profile name="Annotation profile for traveler" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
-        </processorPath>
-        <module name="traveler (1) (com.traveler.auth)" />
       </profile>
     </annotationProcessing>
   </component>

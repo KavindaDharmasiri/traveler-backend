@@ -12,6 +12,10 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
 
+jwt:
+  secret: travelerComprehensiveAppJWTTokenGeneration2025!
+  expiration: 86400000
+
 server:
   port: 8081
 
@@ -32,3 +36,5 @@ management:
   endpoint:
     health:
       show-details: always
+
+
