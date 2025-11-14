@@ -183,4 +183,21 @@ public class AuthService {
     private String generateTenantId(@NotNull UserType type) {
         return "TRAVELER_"+ type.name()+ "_" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
+    
+    public String validateToken(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new AuthException("Invalid authorization header");
+        }
+        
+        String token = authHeader.substring(7);
+        String email = jwtUtil.extractUsername(token);
+        
+        if (email != null && jwtUtil.isTokenValid(token, email)) {
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new AuthException("User not found"));
+            return user.getId().toString();
+        }
+        
+        throw new AuthException("Invalid token");
+    }
 }

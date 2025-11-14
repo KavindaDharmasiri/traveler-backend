@@ -62,4 +62,14 @@ public class AuthController {
         UserResponse response = userService.getCurrentUser(authentication.getName());
         return ResponseEntity.ok(response);
     }
+    
+    @PostMapping("/validate")
+    public ResponseEntity<String> validateToken(@RequestHeader("Authorization") String authHeader) {
+        try {
+            String userId = authService.validateToken(authHeader);
+            return ResponseEntity.ok(userId);
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body("Invalid token");
+        }
+    }
 }
