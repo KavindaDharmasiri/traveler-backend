@@ -5,7 +5,8 @@ import com.traveler.auth.traveler.entity.*;
 import com.traveler.auth.traveler.exception.AuthException;
 import com.traveler.auth.traveler.repository.*;
 import com.traveler.auth.traveler.security.JwtUtil;
-import lombok.RequiredArgsConstructor;
+import com.traveler.auth.traveler.utils.UserType;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -55,6 +56,7 @@ public class AuthService {
         user.setDateOfBirth(request.getDateOfBirth());
         user.setNicNumber(request.getNicNumber());
         user.setNicImageUuid(request.getNicImageUuid());
+        user.setTenantId(generateTenantId(request.getType()));
         user.setIsEmailVerified(true);
         user.setIsNumberVerified(true);
 
@@ -86,6 +88,7 @@ public class AuthService {
         response.setUserId(user.getId());
         response.setEmail(user.getEmail());
         response.setName(user.getName());
+        response.setTenantId(user.getTenantId());
         
         return response;
     }
@@ -134,6 +137,7 @@ public class AuthService {
         response.setUserId(user.getId());
         response.setEmail(user.getEmail());
         response.setName(user.getName());
+        response.setTenantId(user.getTenantId());
         
         return response;
     }
@@ -171,7 +175,12 @@ public class AuthService {
         response.setUserId(user.getId());
         response.setEmail(user.getEmail());
         response.setName(user.getName());
-        
+        response.setTenantId(user.getTenantId());
+
         return response;
+    }
+    
+    private String generateTenantId(@NotNull UserType type) {
+        return "TRAVELER_"+ type.name()+ "_" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 }

@@ -44,6 +44,8 @@
         <module>traveler-discovery</module>
         <module>traveler-auth</module>
         <module>traveler-storage</module>
+        <module>traveler-tenant</module>
+        <module>traveler-core</module>
     </modules>
 
 

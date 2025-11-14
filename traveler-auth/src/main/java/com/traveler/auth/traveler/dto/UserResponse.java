@@ -17,6 +17,7 @@ public class UserResponse {
     private LocalDate dateOfBirth;
     private String nicNumber;
     private String nicImageUuid;
+    private String tenantId;
     private AddressDto address;
     private BankDetailsDto bankDetails;
 }

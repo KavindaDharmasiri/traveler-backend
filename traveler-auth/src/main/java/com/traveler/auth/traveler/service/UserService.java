@@ -44,6 +44,7 @@ public class UserService implements UserDetailsService {
         response.setDateOfBirth(user.getDateOfBirth());
         response.setNicNumber(user.getNicNumber());
         response.setNicImageUuid(user.getNicImageUuid());
+        response.setTenantId(user.getTenantId());
         
         if (user.getAddress() != null) {
             AddressDto addressDto = new AddressDto();
