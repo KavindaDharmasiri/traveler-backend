@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-@FeignClient(name = "traveler-storage")
+@FeignClient(name = "traveler-storage", configuration = com.traveler.auth.traveler.config.FeignConfig.class)
 public interface StorageClient {
 
     @PostMapping("/files/upload")

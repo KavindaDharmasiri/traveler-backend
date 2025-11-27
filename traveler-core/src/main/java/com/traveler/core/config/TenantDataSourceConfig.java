@@ -78,22 +78,32 @@ public class TenantDataSourceConfig {
         @Override
         protected DataSource determineTargetDataSource() {
             String tenantId = TenantContext.getCurrentTenant();
+            System.out.println("[DATASOURCE] Determining datasource for tenant: " + tenantId);
+            System.out.println("[DATASOURCE] Available datasources: " + getResolvedDataSources().keySet());
             if (tenantId != null && !getResolvedDataSources().containsKey(tenantId)) {
+                System.out.println("[DATASOURCE] Tenant " + tenantId + " not found, creating...");
                 synchronized (this) {
                     if (!getResolvedDataSources().containsKey(tenantId)) {
                         createTenantDatabaseAndDataSource(tenantId);
                     }
                 }
+            } else {
+                System.out.println("[DATASOURCE] Using existing datasource for tenant: " + tenantId);
             }
-            return super.determineTargetDataSource();
+            DataSource ds = super.determineTargetDataSource();
+            System.out.println("[DATASOURCE] Selected datasource: " + ds.getClass().getSimpleName());
+            return ds;
         }
         
         private void createTenantDatabaseAndDataSource(String tenantId) {
-            if (createdTenants.containsKey(tenantId)) return;
+            if (createdTenants.containsKey(tenantId)) {
+                System.out.println("[DB_CREATE] Tenant " + tenantId + " already created, skipping");
+                return;
+            }
             
             try {
                 String dbName = tenantId.toLowerCase().replace("-", "_");
-                System.out.println("Creating tenant database: " + dbName + " for tenant: " + tenantId);
+                System.out.println("[DB_CREATE] Creating tenant database: " + dbName + " for tenant: " + tenantId);
                 
                 // Create database
                 String rootUrl = baseUrl.substring(0, baseUrl.lastIndexOf("/"));
