@@ -10,6 +10,8 @@ spring:
           uri: lb://traveler-storage
           predicates:
             - Path=/storage/**
+          filters:
+            - StripPrefix=1
         - id: traveler-tenant
           uri: lb://traveler-tenant
           predicates:

@@ -1,6 +1,6 @@
 package com.traveler.core.config;
 
-import com.traveler.core.service.AuthClient;
+import com.traveler.core.service.feign.AuthClient;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

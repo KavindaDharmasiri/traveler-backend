@@ -22,7 +22,9 @@ public class User {
     private String name;
     
     private String gender;
-    
+
+    private String uniqIdentifier;
+
     @Column(nullable = false ,name = "contact_number", unique = true)
     private String contactNumber;
     

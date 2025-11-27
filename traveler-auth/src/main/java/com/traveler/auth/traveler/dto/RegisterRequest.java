@@ -15,13 +15,19 @@ public class RegisterRequest {
     private String name;
     
     private String gender;
-    
+
+    private String tenant;
+
     @NotBlank
     private String contactNumber;
     
     @NotBlank
     @Email
     private String email;
+
+    @NotBlank
+    @Email
+    private String uniqIdentifier;
     
     @NotBlank
     @Size(min = 8, message = "Password must be at least 8 characters")

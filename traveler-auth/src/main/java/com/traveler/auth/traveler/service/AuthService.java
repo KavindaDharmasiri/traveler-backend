@@ -55,8 +55,9 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setDateOfBirth(request.getDateOfBirth());
         user.setNicNumber(request.getNicNumber());
+//        user.setUniqIdentifier(request.getNicNumber());
         user.setNicImageUuid(request.getNicImageUuid());
-        user.setTenantId(generateTenantId(request.getType()));
+        user.setTenantId(generateTenantId(request.getNicNumber()));
         user.setIsEmailVerified(true);
         user.setIsNumberVerified(true);
 
@@ -92,7 +93,53 @@ public class AuthService {
         
         return response;
     }
-    
+
+
+//    @Transactional
+//    public AuthResponse Changetype(RegisterRequest request) {
+//        log.info("Change attempt for email: {}", request.getEmail());
+//
+//        User user = userRepository.findByTenantId(request.getTenant()).orElseThrow(() -> {
+//            log.warn("Change failed - tenant not found: {}", request.getTenant());
+//            return new AuthException("Tenant not found");
+//        });
+//
+//        user.setType(request.getType());
+//        user.setUniqIdentifier(request.getUniqIdentifier());
+//
+//        Address address = new Address();
+//        address.setStreet1(request.getAddress().getStreet1());
+//        address.setStreet2(request.getAddress().getStreet2());
+//        address.setCity(request.getAddress().getCity());
+//        address.setState(request.getAddress().getState());
+//        address.setPostalCode(request.getAddress().getPostalCode());
+//        user.setAddress(address);
+//
+//        if (request.getBankDetails() != null) {
+//            BankDetails bankDetails = new BankDetails();
+//            bankDetails.setAccountNumber(request.getBankDetails().getAccountNumber());
+//            bankDetails.setHolderName(request.getBankDetails().getHolderName());
+//            bankDetails.setBank(request.getBankDetails().getBank());
+//            bankDetails.setBranch(request.getBankDetails().getBranch());
+//            user.setBankDetails(bankDetails);
+//        }
+//        user.setId(0L);
+//        user = userRepository.save(user);
+//
+//        String accessToken = jwtUtil.generateToken(user.getEmail(), user.getId());
+//        String refreshToken = createRefreshToken(user);
+//
+//        AuthResponse response = new AuthResponse();
+//        response.setAccessToken(accessToken);
+//        response.setRefreshToken(refreshToken);
+//        response.setUserId(user.getId());
+//        response.setEmail(user.getEmail());
+//        response.setName(user.getName());
+//        response.setTenantId(user.getTenantId());
+//
+//        return response;
+//    }
+
     @Transactional
     public AuthResponse login(LoginRequest request, String ipAddress) {
         log.info("Login attempt for email: {} from IP: {}", request.getEmail(), ipAddress);
@@ -180,8 +227,8 @@ public class AuthService {
         return response;
     }
     
-    private String generateTenantId(@NotNull UserType type) {
-        return "TRAVELER_"+ type.name()+ "_" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+    private String generateTenantId(@NotNull String num) {
+        return "TRAVELER_"+ num+ "_" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
     
     public String validateToken(String authHeader) {
