@@ -59,6 +59,7 @@ public class AuthService {
         user.setNicImageUuid(request.getNicImageUuid());
         user.setTenantId(generateTenantId(request.getNicNumber()));
         user.setIsEmailVerified(true);
+        user.setCountry(request.getCountry());
         user.setIsNumberVerified(true);
 
         Address address = new Address();
@@ -184,6 +185,7 @@ public class AuthService {
         response.setUserId(user.getId());
         response.setEmail(user.getEmail());
         response.setName(user.getName());
+        response.setType(String.valueOf(user.getType()));
         response.setTenantId(user.getTenantId());
         
         return response;
@@ -227,8 +229,9 @@ public class AuthService {
         return response;
     }
     
-    private String generateTenantId(@NotNull String num) {
-        return "TRAVELER_"+ num+ "_" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+    private String generateTenantId(String num) {
+        String identifier = (num != null && !num.trim().isEmpty()) ? num.trim() : "USER";
+        return "TRAVELER_" + identifier + "_" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
     
     public String validateToken(String authHeader) {

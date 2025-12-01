@@ -23,7 +23,7 @@ public class User {
     
     private String gender;
 
-    private String uniqIdentifier;
+//    private String uniqIdentifier;
 
     @Column(nullable = false ,name = "contact_number", unique = true)
     private String contactNumber;
@@ -39,6 +39,8 @@ public class User {
     
     @Column(nullable = false)
     private String password;
+    @Column(nullable = false)
+    private String country;
 
     @Column(name = "profile_image_uuid")
     private String profileImageUuid;
