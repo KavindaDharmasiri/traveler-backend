@@ -1,10 +1,8 @@
 package com.traveler.core.controller;
 
-import com.traveler.common.dto.TripDto;
 import com.traveler.common.dto.provider.ItemDTO;
-import com.traveler.common.entity.Trip;
-import com.traveler.core.config.TenantContext;
-import com.traveler.core.repository.TripRepository;
+import com.traveler.common.dto.traveller.ItemDetailsDTO;
+import com.traveler.common.dto.traveller.ProviderItemGroupDTO;
 import com.traveler.core.service.ProviderItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +40,28 @@ public class providerItemController {
     @DeleteMapping("/{itemId}")
     public ResponseEntity<String> deleteItem(@PathVariable Long itemId) {
         return providerItemService.deleteItem(itemId);
+    }
+
+
+    /////for traveller
+//api for postman
+    @GetMapping("/getAllForTraveller")
+    public ResponseEntity<List<ProviderItemGroupDTO>> getItemsForTravellers() {
+        return providerItemService.getItemsForTraveller();
+    }
+
+    //api for feign auth client
+    @GetMapping("/getItemsForTraveller")
+    public List<ItemDetailsDTO> getItemsForTraveller() {
+        return providerItemService.getItemsForTravellers();
+    }
+
+    @GetMapping("/{itemId}/{tenant}")
+    public ResponseEntity<ItemDTO> getItem(
+            @PathVariable Long itemId,
+            @PathVariable String tenant) {
+
+        return providerItemService.getItemforTraveller(itemId, tenant);
     }
 
 }

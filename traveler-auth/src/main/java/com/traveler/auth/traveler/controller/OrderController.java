@@ -8,6 +8,9 @@ import com.traveler.auth.traveler.service.AuthService;
 import com.traveler.auth.traveler.service.OrderService;
 import com.traveler.auth.traveler.service.UserService;
 import com.traveler.common.dto.OrderDTO;
+import com.traveler.common.dto.provider.ItemDTO;
+import com.traveler.common.dto.traveller.ItemDetailsDTO;
+import com.traveler.common.dto.traveller.ProviderItemGroupDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -50,5 +53,18 @@ public class OrderController {
             e.printStackTrace();
             throw e;
         }
+    }
+
+
+    @GetMapping("/getAllForTraveller")
+    public ResponseEntity<List<ProviderItemGroupDTO>> getAllForTraveller() {
+        return orderService.getAllForTraveller();
+    }
+
+    @GetMapping("/getItemForTraveler/{itemId}/{tenant}")
+    public ResponseEntity<ItemDTO> getItemForTraveler(@PathVariable Long itemId,
+                                                      @PathVariable String tenant) {
+        System.out.println("awaaaaaa");
+        return orderService.getItemForTraveler(itemId,tenant);
     }
 }

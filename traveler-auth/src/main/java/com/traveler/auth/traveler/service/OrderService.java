@@ -1,12 +1,19 @@
 package com.traveler.auth.traveler.service;
 
+import com.traveler.auth.traveler.entity.User;
 import com.traveler.auth.traveler.feignClient.CoreClient;
 import com.traveler.auth.traveler.repository.OrderRepository;
+import com.traveler.auth.traveler.repository.UserRepository;
+import com.traveler.auth.traveler.utils.UserType;
 import com.traveler.common.dto.OrderDTO;
+import com.traveler.common.dto.provider.ItemDTO;
+import com.traveler.common.dto.traveller.ItemDetailsDTO;
+import com.traveler.common.dto.traveller.ProviderItemGroupDTO;
 import com.traveler.common.entity.Order;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,10 +29,12 @@ import java.util.UUID;
 public class OrderService {
     private final CoreClient coreClient;
     private final OrderRepository orderRepository;
+    private final UserRepository userRepository;
 
-    public OrderService(CoreClient coreClient, OrderRepository orderRepository) {
+    public OrderService(CoreClient coreClient, OrderRepository orderRepository, UserRepository userRepository) {
         this.coreClient = coreClient;
         this.orderRepository = orderRepository;
+        this.userRepository = userRepository;
     }
 
     public ResponseEntity<String> createOrder(OrderDTO orderDTO) {
@@ -128,6 +137,40 @@ public class OrderService {
             System.out.println("ERROR in findOrder: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.status(500).build();
+        }
+    }
+
+    public ResponseEntity<List<ProviderItemGroupDTO>> getAllForTraveller() {
+        try{
+            List<User> allByTypeAndIsActive = userRepository.findAllByTypeAndIsActive(UserType.SERVICE_PROVIDER, true);
+            List<ProviderItemGroupDTO> result = new ArrayList<>();
+            for (User user : allByTypeAndIsActive) {
+                System.out.println("Fetching orders for traveller tenant: " + user.getTenantId());
+                List<ItemDetailsDTO> itemDetailsDTOS = new ArrayList<>();
+                List<ItemDetailsDTO> response = coreClient.getItemsForTraveller(user.getTenantId());
+
+                ProviderItemGroupDTO group = new ProviderItemGroupDTO(
+                        user.getTenantId(),
+                        user.getName(),
+                        response
+                );
+
+                result.add(group);
+
+            }
+            return ResponseEntity.ok(result);
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public ResponseEntity<ItemDTO> getItemForTraveler(Long itemId, String tenant) {
+        try {
+            return coreClient.getItem(itemId, tenant);
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
         }
     }
 }

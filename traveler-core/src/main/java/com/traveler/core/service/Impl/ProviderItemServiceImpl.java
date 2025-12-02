@@ -1,14 +1,18 @@
 package com.traveler.core.service.Impl;
 
 import com.traveler.common.dto.provider.ItemDTO;
+import com.traveler.common.dto.traveller.ItemDetailsDTO;
 import com.traveler.common.dto.provider.VehicleDetailsDTO;
 import com.traveler.common.dto.provider.HotelDetailsDTO;
+import com.traveler.common.dto.traveller.ProviderItemGroupDTO;
 import com.traveler.common.entity.provider.Item;
 import com.traveler.common.entity.provider.VehicleDetails;
 import com.traveler.common.entity.provider.HotelDetails;
 import com.traveler.common.utils.STATUS;
+import com.traveler.core.config.TenantContext;
 import com.traveler.core.repository.ItemRepository;
 import com.traveler.core.service.ProviderItemService;
+import com.traveler.core.service.feign.AuthClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -25,9 +29,11 @@ import java.util.Optional;
 @Service
 public class ProviderItemServiceImpl implements ProviderItemService {
     private ItemRepository itemRepository;
+    private AuthClient authClient;
 
-    public ProviderItemServiceImpl(ItemRepository itemRepository) {
+    public ProviderItemServiceImpl(ItemRepository itemRepository, AuthClient authClient) {
         this.itemRepository = itemRepository;
+        this.authClient = authClient;
     }
 
     @Override
@@ -107,6 +113,40 @@ public class ProviderItemServiceImpl implements ProviderItemService {
     }
 
     @Override
+    public ResponseEntity<List<ProviderItemGroupDTO>> getItemsForTraveller() {
+        try{
+            return authClient.getAllForTraveller();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public List<ItemDetailsDTO> getItemsForTravellers() {
+        try{
+            List<Item> allByStatus = itemRepository.findAll();
+            List<ItemDetailsDTO> itemDetailsList = allByStatus.stream()
+                    .map(this::convertToDetailsDTO)
+                    .toList();
+            return itemDetailsList;
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public ResponseEntity<ItemDTO> getItemforTraveller(Long itemId, String tenant) {
+        try {
+            return authClient.getItemForTraveler(itemId,tenant);
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.ok(null);
+        }
+    }
+
+    @Override
     public ResponseEntity<List<ItemDTO>> getItems() {
         try {
             List<Item> all = itemRepository.findAll();
@@ -158,6 +198,41 @@ public class ProviderItemServiceImpl implements ProviderItemService {
         }
         
         // Convert hotel details if present
+        if (item.getHotelDetails() != null) {
+            HotelDetailsDTO hotelDTO = new HotelDetailsDTO();
+            hotelDTO.setAddress(item.getHotelDetails().getAddress());
+            hotelDTO.setRoomNumber(item.getHotelDetails().getRoomNumber());
+            hotelDTO.setMaxGuests(item.getHotelDetails().getMaxGuests());
+            dto.setHotelDetails(hotelDTO);
+        }
+        
+        return dto;
+    }
+    
+    private ItemDetailsDTO convertToDetailsDTO(Item item) {
+        ItemDetailsDTO dto = new ItemDetailsDTO();
+        dto.setId(item.getId());
+        dto.setName(item.getName());
+        dto.setCategory(item.getCategory());
+        dto.setContact(item.getContact());
+        dto.setDescription(item.getDescription());
+        dto.setPricePerDay(item.getPricePerDay());
+        dto.setStatus(item.getStatus());
+        dto.setCurrency(item.getCurrency());
+        dto.setImages(List.of(item.getImages().split(",")));
+        
+        if (item.getVehicleDetails() != null) {
+            VehicleDetailsDTO vehicleDTO = new VehicleDetailsDTO();
+            vehicleDTO.setVehicleNumber(item.getVehicleDetails().getVehicleNumber());
+            vehicleDTO.setPassengerCount(item.getVehicleDetails().getPassengerCount());
+            vehicleDTO.setCondition(item.getVehicleDetails().getCondition());
+            vehicleDTO.setKmPerDay(item.getVehicleDetails().getKmPerDay());
+            vehicleDTO.setPricePerExtraKm(item.getVehicleDetails().getPricePerExtraKm());
+            vehicleDTO.setDriverStatus(item.getVehicleDetails().getDriverStatus());
+            vehicleDTO.setWaitingChargePerNight(item.getVehicleDetails().getWaitingChargePerNight());
+            dto.setVehicleDetails(vehicleDTO);
+        }
+        
         if (item.getHotelDetails() != null) {
             HotelDetailsDTO hotelDTO = new HotelDetailsDTO();
             hotelDTO.setAddress(item.getHotelDetails().getAddress());
