@@ -21,7 +21,10 @@ public class ItemDTO {
     private Long id;
     private String contact;
     private String description;
+    private String currency;
     private STATUS status;
     private List<String> images;
     private double pricePerDay;
+    private VehicleDetailsDTO vehicleDetails;
+    private HotelDetailsDTO hotelDetails;
 }

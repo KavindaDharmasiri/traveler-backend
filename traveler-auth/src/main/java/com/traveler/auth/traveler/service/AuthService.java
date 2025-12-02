@@ -187,7 +187,8 @@ public class AuthService {
         response.setName(user.getName());
         response.setType(String.valueOf(user.getType()));
         response.setTenantId(user.getTenantId());
-        
+        response.setCountry(user.getCountry());
+
         return response;
     }
     
@@ -232,6 +233,15 @@ public class AuthService {
     private String generateTenantId(String num) {
         String identifier = (num != null && !num.trim().isEmpty()) ? num.trim() : "USER";
         return "TRAVELER_" + identifier + "_" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+    }
+    
+    @Transactional
+    public void logout(String refreshToken) {
+        RefreshToken token = refreshTokenRepository.findByToken(refreshToken)
+                .orElseThrow(() -> new AuthException("Invalid refresh token"));
+        
+        refreshTokenRepository.delete(token);
+        log.info("User logged out successfully: {}", token.getUser().getEmail());
     }
     
     public String validateToken(String authHeader) {

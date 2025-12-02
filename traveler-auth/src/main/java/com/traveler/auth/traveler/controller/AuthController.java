@@ -63,6 +63,16 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
     
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestParam String refreshToken) {
+        try {
+            authService.logout(refreshToken);
+            return ResponseEntity.ok("Logged out successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("Logout failed: " + e.getMessage());
+        }
+    }
+    
     @PostMapping("/validate")
     public ResponseEntity<String> validateToken(@RequestHeader("Authorization") String authHeader) {
         try {

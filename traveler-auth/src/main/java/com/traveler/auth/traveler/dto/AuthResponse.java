@@ -12,4 +12,5 @@ public class AuthResponse {
     private String name;
     private String type;
     private String tenantId;
+    private String country;
 }

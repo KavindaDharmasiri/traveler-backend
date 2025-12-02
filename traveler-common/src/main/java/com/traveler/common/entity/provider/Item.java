@@ -16,8 +16,8 @@ import java.util.List;
 @Table(name = "item")
 public class Item {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false, columnDefinition = "BIGINT AUTO_INCREMENT")
     private Long id;
 
     private String category;
@@ -25,10 +25,19 @@ public class Item {
     private String contact;
     private String description;
     private String images;
+    private String currency;
     private STATUS status;
 
     @Column(name = "price_per_day")
     private double pricePerDay;
+    
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "vehicle_details_id")
+    private VehicleDetails vehicleDetails;
+    
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "hotel_details_id")
+    private HotelDetails hotelDetails;
 
     public Long getId() {
         return id;
@@ -92,5 +101,29 @@ public class Item {
 
     public void setStatus(STATUS status) {
         this.status = status;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+    
+    public VehicleDetails getVehicleDetails() {
+        return vehicleDetails;
+    }
+    
+    public void setVehicleDetails(VehicleDetails vehicleDetails) {
+        this.vehicleDetails = vehicleDetails;
+    }
+    
+    public HotelDetails getHotelDetails() {
+        return hotelDetails;
+    }
+    
+    public void setHotelDetails(HotelDetails hotelDetails) {
+        this.hotelDetails = hotelDetails;
     }
 }
