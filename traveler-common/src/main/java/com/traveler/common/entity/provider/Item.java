@@ -2,7 +2,11 @@ package com.traveler.common.entity.provider;
 
 import com.traveler.common.utils.STATUS;
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -26,6 +30,12 @@ public class Item {
     private String description;
     private String images;
     private String currency;
+    @Column(name = "created_at")
+    @CreationTimestamp
+    private Date createdAt;
+    @Column(name = "updated_at")
+    @UpdateTimestamp
+    private Date updatedAt;
     private STATUS status;
 
     @Column(name = "price_per_day")
@@ -38,6 +48,9 @@ public class Item {
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "hotel_details_id")
     private HotelDetails hotelDetails;
+    
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ItemReview> reviews = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -125,5 +138,13 @@ public class Item {
     
     public void setHotelDetails(HotelDetails hotelDetails) {
         this.hotelDetails = hotelDetails;
+    }
+    
+    public List<ItemReview> getReviews() {
+        return reviews;
+    }
+    
+    public void setReviews(List<ItemReview> reviews) {
+        this.reviews = reviews;
     }
 }

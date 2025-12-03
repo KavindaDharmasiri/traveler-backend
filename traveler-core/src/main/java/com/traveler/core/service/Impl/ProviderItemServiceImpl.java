@@ -1,6 +1,7 @@
 package com.traveler.core.service.Impl;
 
 import com.traveler.common.dto.provider.ItemDTO;
+import com.traveler.common.dto.provider.ItemReviewDTO;
 import com.traveler.common.dto.traveller.ItemDetailsDTO;
 import com.traveler.common.dto.provider.VehicleDetailsDTO;
 import com.traveler.common.dto.provider.HotelDetailsDTO;
@@ -16,6 +17,7 @@ import com.traveler.core.service.feign.AuthClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -125,7 +127,7 @@ public class ProviderItemServiceImpl implements ProviderItemService {
     @Override
     public List<ItemDetailsDTO> getItemsForTravellers() {
         try{
-            List<Item> allByStatus = itemRepository.findAll();
+            List<Item> allByStatus = itemRepository.findAllByStatus(STATUS.ACTIVE);
             List<ItemDetailsDTO> itemDetailsList = allByStatus.stream()
                     .map(this::convertToDetailsDTO)
                     .toList();
@@ -204,6 +206,21 @@ public class ProviderItemServiceImpl implements ProviderItemService {
             hotelDTO.setRoomNumber(item.getHotelDetails().getRoomNumber());
             hotelDTO.setMaxGuests(item.getHotelDetails().getMaxGuests());
             dto.setHotelDetails(hotelDTO);
+        }
+
+        if (item.getReviews() != null) {
+            List<ItemReviewDTO> itemReviewDTOS = new ArrayList<>();
+            item.getReviews().forEach(review -> {
+               ItemReviewDTO itemReviewDTO = new ItemReviewDTO();
+               itemReviewDTO.setTravelerTenant(review.getTravelerTenant());
+               itemReviewDTO.setReviewText(review.getReviewText());
+               itemReviewDTO.setRating(review.getRating());
+               itemReviewDTO.setCreatedAt(review.getCreatedAt());
+
+               itemReviewDTOS.add(itemReviewDTO);
+            });
+
+            dto.setReviews(itemReviewDTOS);
         }
         
         return dto;
