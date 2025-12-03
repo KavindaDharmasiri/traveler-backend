@@ -41,7 +41,8 @@ public class RegisterRequest {
     private String nicNumber;
     
     private String nicImageUuid;
-    
+    private String googleMapsUrl;
+
     @NotNull
     private AddressDto address;
     

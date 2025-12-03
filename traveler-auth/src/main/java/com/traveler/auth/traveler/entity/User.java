@@ -22,6 +22,8 @@ public class User {
     private String name;
     
     private String gender;
+    @Column(name = "google_maps_url")
+    private String googleMapsUrl;
 
 //    private String uniqIdentifier;
 

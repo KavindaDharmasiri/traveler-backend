@@ -20,7 +20,7 @@ import java.util.Date;
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(name = "id", nullable = false, columnDefinition = "BIGINT AUTO_INCREMENT")
     private Long id;
 
     @Column(name = "order_code", nullable = false, unique = true)

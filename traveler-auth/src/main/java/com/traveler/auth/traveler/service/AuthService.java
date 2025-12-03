@@ -60,6 +60,7 @@ public class AuthService {
         user.setTenantId(generateTenantId(request.getNicNumber()));
         user.setIsEmailVerified(true);
         user.setCountry(request.getCountry());
+        user.setGoogleMapsUrl(request.getGoogleMapsUrl());
         user.setIsNumberVerified(true);
 
         Address address = new Address();
