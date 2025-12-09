@@ -1,5 +1,6 @@
 package com.traveler.core.service.feign;
 
+import com.traveler.common.dto.BulkOrderStatusUpdateDTO;
 import com.traveler.common.dto.OrderDTO;
 import com.traveler.common.dto.UserResponse;
 import com.traveler.common.dto.provider.ItemDTO;
@@ -34,4 +35,7 @@ public interface AuthClient {
 
     @GetMapping("/auth/user")
     UserResponse getUserByTenant(@RequestParam("tenant") String tenant);
+
+    @PutMapping("/order/changeStatus")
+    String updateOrderStatus(@RequestBody BulkOrderStatusUpdateDTO updateDTO);
 }

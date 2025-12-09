@@ -46,6 +46,7 @@
         <module>traveler-auth</module>
         <module>traveler-storage</module>
         <module>traveler-core</module>
+        <module>traveler-notification</module>
     </modules>
 
 

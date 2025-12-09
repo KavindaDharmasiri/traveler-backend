@@ -3,6 +3,7 @@ package com.traveler.auth.traveler.feignClient;
 import com.traveler.common.dto.OrderDTO;
 import com.traveler.common.dto.provider.ItemDTO;
 import com.traveler.common.dto.traveller.ItemDetailsDTO;
+import com.traveler.common.utils.STATUS;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,4 +21,7 @@ public interface CoreClient {
 
     @GetMapping("/api/v1/provider/item/{itemId}")
     ResponseEntity<ItemDTO> getItem(@PathVariable Long itemId, @RequestHeader("X-Tenant-Id") String tenantId);
+
+    @PutMapping("/api/v1/order/bulk-update-status/{orderCode}/{status}")
+    String updateStatus(@PathVariable String orderCode, @PathVariable String status, @RequestHeader("X-Tenant-Id") String clientTenant);
 }

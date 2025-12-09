@@ -5,6 +5,7 @@ import com.traveler.auth.traveler.feignClient.CoreClient;
 import com.traveler.auth.traveler.repository.OrderRepository;
 import com.traveler.auth.traveler.repository.UserRepository;
 import com.traveler.auth.traveler.utils.UserType;
+import com.traveler.common.dto.BulkOrderStatusUpdateDTO;
 import com.traveler.common.dto.OrderDTO;
 import com.traveler.common.dto.provider.ItemDTO;
 import com.traveler.common.dto.traveller.ItemDetailsDTO;
@@ -171,6 +172,24 @@ public class OrderService {
         }catch (Exception e){
             e.printStackTrace();
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    public ResponseEntity<String> changeStatus(BulkOrderStatusUpdateDTO bulkOrderStatusUpdateDTO) {
+        try{
+            bulkOrderStatusUpdateDTO.getOrderCodes().stream().forEach(orderCode -> {
+                Optional<Order> orderOpt = orderRepository.findByOrderCode(orderCode);
+                if (orderOpt.isPresent()) {
+                    Order order = orderOpt.get();
+                    coreClient.updateStatus(order.getOrderCode(), bulkOrderStatusUpdateDTO.getStatus().name(), order.getClientTenant());
+                    coreClient.updateStatus(order.getOrderCode(), bulkOrderStatusUpdateDTO.getStatus().name(), order.getProviderTenant());
+                    order.setStatus(bulkOrderStatusUpdateDTO.getStatus());
+                    orderRepository.save(order);
+                }
+            });
+            return ResponseEntity.ok("Status updated successfully");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }

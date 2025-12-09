@@ -7,6 +7,7 @@ import com.traveler.auth.traveler.dto.UserResponse;
 import com.traveler.auth.traveler.service.AuthService;
 import com.traveler.auth.traveler.service.OrderService;
 import com.traveler.auth.traveler.service.UserService;
+import com.traveler.common.dto.BulkOrderStatusUpdateDTO;
 import com.traveler.common.dto.OrderDTO;
 import com.traveler.common.dto.provider.ItemDTO;
 import com.traveler.common.dto.traveller.ItemDetailsDTO;
@@ -34,6 +35,11 @@ public class OrderController {
     @PostMapping()
     public ResponseEntity<String> createOrder( @RequestBody OrderDTO orderDTO) {
         return orderService.createOrder(orderDTO);
+    }
+
+    @PutMapping("/changeStatus")
+    public ResponseEntity<String> changeStatus( @RequestBody BulkOrderStatusUpdateDTO bulkOrderStatusUpdateDTO) {
+        return orderService.changeStatus(bulkOrderStatusUpdateDTO);
     }
 
     @GetMapping()
@@ -64,7 +70,6 @@ public class OrderController {
     @GetMapping("/getItemForTraveler/{itemId}/{tenant}")
     public ResponseEntity<ItemDTO> getItemForTraveler(@PathVariable Long itemId,
                                                       @PathVariable String tenant) {
-        System.out.println("awaaaaaa");
         return orderService.getItemForTraveler(itemId,tenant);
     }
 }

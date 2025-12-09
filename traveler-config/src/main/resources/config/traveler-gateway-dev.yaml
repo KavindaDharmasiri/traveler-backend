@@ -6,6 +6,10 @@ spring:
           uri: lb://traveler-auth
           predicates:
             - Path=/auth/**
+        - id: traveler-auth
+          uri: lb://traveler-auth
+          predicates:
+            - Path=/auth-service/**
         - id: traveler-storage
           uri: lb://traveler-storage
           predicates:
@@ -20,6 +24,12 @@ spring:
           uri: lb://traveler-core
           predicates:
             - Path=/core/**
+          filters:
+            - StripPrefix=1
+        - id: traveler-notification
+          uri: lb://traveler-notification
+          predicates:
+            - Path=/notification/**
           filters:
             - StripPrefix=1
       discovery:

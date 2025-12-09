@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="traveler-discovery" />
         <module name="traveler (1) (com.traveler.auth)" />
+        <module name="traveler-notification" />
         <module name="traveler-config" />
         <module name="traveler-storage" />
         <module name="traveler-core" />
@@ -26,6 +27,7 @@
       <module name="traveler-core" options="-parameters" />
       <module name="traveler-discovery" options="-parameters" />
       <module name="traveler-gateway" options="-parameters" />
+      <module name="traveler-notification" options="-parameters" />
       <module name="traveler-storage" options="-parameters" />
       <module name="traveler-tenant" options="-parameters" />
     </option>

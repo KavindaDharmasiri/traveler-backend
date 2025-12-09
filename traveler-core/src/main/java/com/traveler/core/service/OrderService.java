@@ -1,5 +1,6 @@
 package com.traveler.core.service;
 
+import com.traveler.common.dto.BulkOrderStatusUpdateDTO;
 import com.traveler.common.dto.OrderDTO;
 import org.springframework.http.ResponseEntity;
 
@@ -25,4 +26,8 @@ public interface OrderService {
     ResponseEntity<List<OrderDTO>> findAllOrdersFromAdmin();
 
     ResponseEntity<OrderDTO> getOrderFromAdmin(Long orderId);
+
+    ResponseEntity<String> updateStatusWithSup(BulkOrderStatusUpdateDTO updateDTO);
+
+    ResponseEntity<String> bulkUpdateOrderStatus(String orderCode, String status);
 }

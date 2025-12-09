@@ -1,5 +1,6 @@
 package com.traveler.core.controller;
 
+import com.traveler.common.dto.BulkOrderStatusUpdateDTO;
 import com.traveler.common.dto.OrderDTO;
 import com.traveler.common.dto.provider.ItemDTO;
 import com.traveler.core.service.OrderService;
@@ -48,5 +49,14 @@ public class OrderController {
         return orderService.getOrderFromAdmin(orderId);
     }
 
+    @PutMapping("/updateStatus")
+    public ResponseEntity<String> updateStatusWithSup(@RequestBody BulkOrderStatusUpdateDTO updateDTO) {
+        return orderService.updateStatusWithSup(updateDTO);
+    }
+
+    @PutMapping("/bulk-update-status/{orderCode}/{status}")
+    public ResponseEntity<String> bulkUpdateOrderStatus(@PathVariable String orderCode, @PathVariable String status, @RequestHeader(required = false) String clientTenant) {
+        return orderService.bulkUpdateOrderStatus(orderCode, status);
+    }
 
 }

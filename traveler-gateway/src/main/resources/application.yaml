@@ -22,6 +22,12 @@ spring:
           filters:
             - StripPrefix=1
             - PreserveHostHeader
+        - id: notification-service
+          uri: lb://traveler-notification
+          predicates:
+            - Path=/notification/**
+          filters:
+            - PreserveHostHeader
       discovery:
         locator:
           enabled: true

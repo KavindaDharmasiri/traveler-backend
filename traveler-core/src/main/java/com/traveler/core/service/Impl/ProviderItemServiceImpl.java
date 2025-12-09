@@ -31,9 +31,9 @@ import java.util.Optional;
 @Service
 public class ProviderItemServiceImpl implements ProviderItemService {
     private ItemRepository itemRepository;
-    private AuthClient authClient;
+    private com.traveler.core.service.feign.AuthClient authClient;
 
-    public ProviderItemServiceImpl(ItemRepository itemRepository, AuthClient authClient) {
+    public ProviderItemServiceImpl(ItemRepository itemRepository, com.traveler.core.service.feign.AuthClient authClient) {
         this.itemRepository = itemRepository;
         this.authClient = authClient;
     }
