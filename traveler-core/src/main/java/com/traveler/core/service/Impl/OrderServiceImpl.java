@@ -245,6 +245,10 @@ public class OrderServiceImpl implements OrderService {
                     notification.setMessage("Your order has been completed");
                     notification.setNotificationType("ORDER_ACCEPTED");
                     notification.setTitle("Your Order Is "+status+" By Provider");
+                } else if (status.equals("PAYED")) {
+                    notification.setMessage("Your order has been completed");
+                    notification.setNotificationType("ORDER_PAYED");
+                    notification.setTitle("Order "+status+" By "+order.getCustomerName());
                 } else {
                     notification.setNotificationType("ORDER_UPDATE");
                     notification.setTitle("Your Order Is "+status+" By Provider");
