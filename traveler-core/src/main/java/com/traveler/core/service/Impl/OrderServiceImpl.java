@@ -219,10 +219,13 @@ public class OrderServiceImpl implements OrderService {
                 orderRepository.save(order);
 
                 NotificationDTO notification = new NotificationDTO();
-                if (authClient.getUserByTenant(TenantContext.getCurrentTenant()).getType().equals("SERVICE_PROVIDER")) {
+
+                if (authClient.getUserByTenant(TenantContext.getCurrentTenant()).getType().name().equals("SERVICE_PROVIDER")) {
+                    System.out.println("1");
                     notification.setSenderTenant(order.getProviderTenant());
                     notification.setReceiverTenant(order.getProviderTenant());
                 } else {
+                    System.out.println("2");
                     notification.setSenderTenant(order.getProviderTenant());
                     notification.setReceiverTenant(order.getClientTenant());
 
