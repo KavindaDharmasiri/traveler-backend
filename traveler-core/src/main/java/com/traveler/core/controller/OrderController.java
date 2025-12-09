@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/order")
@@ -28,7 +29,7 @@ public class OrderController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<OrderDTO>> getOrders() {
+    public ResponseEntity<Map<String, Map<String, List<OrderDTO>>>> getOrders() {
         return orderService.findAllOrders();
     }
 

@@ -1,16 +1,20 @@
 package com.traveler.core.service.Impl;
 
 import com.traveler.common.dto.OrderDTO;
+import com.traveler.common.dto.UserResponse;
 import com.traveler.common.entity.Order;
 import com.traveler.common.utils.STATUS;
+import com.traveler.core.config.TenantContext;
+import com.traveler.core.controller.CoreController;
 import com.traveler.core.repository.OrderRepository;
 import com.traveler.core.service.OrderService;
 import com.traveler.core.service.TenantOrderService;
 import com.traveler.core.service.feign.AuthClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,11 +32,13 @@ public class OrderServiceImpl implements OrderService {
     private final TenantOrderService tenantOrderService;
     private final OrderRepository orderRepository;
     private final AuthClient authClient;
+    private final CoreController coreController;
 
-    public OrderServiceImpl(TenantOrderService tenantOrderService, OrderRepository orderRepository, AuthClient authClient) {
+    public OrderServiceImpl(TenantOrderService tenantOrderService, OrderRepository orderRepository, AuthClient authClient, CoreController coreController) {
         this.tenantOrderService = tenantOrderService;
         this.orderRepository = orderRepository;
         this.authClient = authClient;
+        this.coreController = coreController;
     }
 
     @Override
@@ -80,24 +86,44 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ResponseEntity<List<OrderDTO>> findAllOrders() {
+    public ResponseEntity<Map<String, Map<String, List<OrderDTO>>>> findAllOrders() {
         try {
+            String currentTenant = TenantContext.getCurrentTenant();
+            System.out.println("Current tenant: " + currentTenant);
+            var currentUser = authClient.getUserByTenant(currentTenant);
+            boolean isServiceProvider = "SERVICE_PROVIDER".equals(currentUser.getType());
+
             List<Order> all = orderRepository.findAllByStatusNot(STATUS.DELETED);
-            List<OrderDTO> orderDTOS = all.stream().map(order -> {
-                OrderDTO orderDTO = new OrderDTO();
-                orderDTO.setId(order.getId());
-                orderDTO.setOrderCode(order.getOrderCode());
-                orderDTO.setCustomerName(order.getCustomerName());
-                orderDTO.setItem(order.getItem());
-                orderDTO.setStatus(order.getStatus());
-                orderDTO.setTotalPrice(order.getTotalPrice());
-                orderDTO.setRentalDays(order.getRentalDays());
-                orderDTO.setClientTenant(order.getClientTenant());
-                orderDTO.setProviderTenant(order.getProviderTenant());
-                return orderDTO;
-            }).toList();
-            return ResponseEntity.ok(orderDTOS);
-        }catch (Exception e){
+
+            Map<String, Map<String, List<OrderDTO>>> groupedOrders = all.stream()
+                    .map(order -> {
+                        OrderDTO orderDTO = new OrderDTO();
+                        orderDTO.setId(order.getId());
+                        orderDTO.setOrderCode(order.getOrderCode());
+                        orderDTO.setCustomerName(order.getCustomerName());
+                        orderDTO.setItem(order.getItem());
+                        orderDTO.setStatus(order.getStatus());
+                        orderDTO.setTotalPrice(order.getTotalPrice());
+                        orderDTO.setRentalDays(order.getRentalDays());
+                        orderDTO.setClientTenant(order.getClientTenant());
+                        orderDTO.setProviderTenant(order.getProviderTenant());
+
+                        String groupTenant = isServiceProvider ? order.getClientTenant() : order.getProviderTenant();
+                        var tenantUser = authClient.getUserByTenant(groupTenant);
+                        String groupName = tenantUser.getName();
+
+                        orderDTO.setGroupTenant(groupTenant);
+                        orderDTO.setGroupName(groupName);
+
+                        return orderDTO;
+                    })
+                    .collect(Collectors.groupingBy(
+                            OrderDTO::getGroupTenant,
+                            Collectors.groupingBy(OrderDTO::getGroupName)
+                    ));
+
+            return ResponseEntity.ok(groupedOrders);
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body(null);
         }

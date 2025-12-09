@@ -4,6 +4,7 @@ import com.traveler.common.dto.OrderDTO;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * ALL RIGHT RESERVED By kavinda_d
@@ -17,7 +18,7 @@ public interface OrderService {
 
     ResponseEntity<String> createOrderWithSup(OrderDTO orderDTO);
 
-    ResponseEntity<List<OrderDTO>> findAllOrders();
+    ResponseEntity<Map<String, Map<String, List<OrderDTO>>>> findAllOrders();
 
     ResponseEntity<OrderDTO> findOrder(Long orderId);
 

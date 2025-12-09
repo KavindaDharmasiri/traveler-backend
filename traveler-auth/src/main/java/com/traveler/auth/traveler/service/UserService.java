@@ -67,4 +67,26 @@ public class UserService implements UserDetailsService {
         
         return response;
     }
+
+    public UserResponse getUserByTenant(String tenant) {
+        try{
+            User user = userRepository.findByTenantId(tenant).orElseThrow(() -> new RuntimeException("User not found"));
+            UserResponse response = new UserResponse();
+            response.setId(user.getId());
+            response.setType(user.getType());
+            response.setName(user.getName());
+            response.setGender(user.getGender());
+            response.setContactNumber(user.getContactNumber());
+            response.setIsNumberVerified(user.getIsNumberVerified());
+            response.setEmail(user.getEmail());
+            response.setIsEmailVerified(user.getIsEmailVerified());
+            response.setDateOfBirth(user.getDateOfBirth());
+            response.setNicNumber(user.getNicNumber());
+            response.setNicImageUuid(user.getNicImageUuid());
+            response.setTenantId(user.getTenantId());
+            return response;
+        } catch (Exception e){
+            throw new RuntimeException("User not found for tenant: " + tenant);
+        }
+    }
 }

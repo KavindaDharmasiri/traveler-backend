@@ -23,6 +23,8 @@ public class OrderDTO {
     private int rentalDays;
     private String clientTenant;
     private String providerTenant;
+    private String groupTenant;
+    private String groupName;
 
     public Long getId() {
         return id;
@@ -96,4 +98,19 @@ public class OrderDTO {
         this.providerTenant = providerTenant;
     }
 
+    public String getGroupTenant() {
+        return groupTenant;
+    }
+
+    public void setGroupTenant(String groupTenant) {
+        this.groupTenant = groupTenant;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
 }

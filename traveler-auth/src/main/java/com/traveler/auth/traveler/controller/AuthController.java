@@ -82,4 +82,10 @@ public class AuthController {
             return ResponseEntity.status(401).body("Invalid token");
         }
     }
+
+    @GetMapping("/user")
+    public UserResponse getUserByTenant(@RequestParam String tenant) {
+        UserResponse response = userService.getUserByTenant(tenant);
+        return response;
+    }
 }
