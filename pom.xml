@@ -47,6 +47,7 @@
         <module>traveler-storage</module>
         <module>traveler-core</module>
         <module>traveler-notification</module>
+        <module>traveler-payment</module>
     </modules>
 
 

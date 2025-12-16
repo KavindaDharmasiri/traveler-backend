@@ -32,6 +32,12 @@ spring:
             - Path=/notification/**
           filters:
             - StripPrefix=1
+        - id: traveler-payment
+          uri: lb://traveler-payment
+          predicates:
+            - Path=/payment/**
+          filters:
+            - StripPrefix=1
       discovery:
         locator:
           enabled: true

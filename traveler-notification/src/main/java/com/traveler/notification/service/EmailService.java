@@ -6,8 +6,12 @@ import com.traveler.notification.client.AuthClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import jakarta.mail.internet.MimeMessage;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.util.StreamUtils;
+import java.nio.charset.StandardCharsets;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,24 +49,49 @@ public class EmailService {
         System.out.println(verificationCode);
 
         // Send email
-//        sendVerificationEmail(email, verificationCode);
+        sendVerificationEmail(email, verificationCode);
     }
 
     private void sendVerificationEmail(String email, String verificationCode) {
         try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(fromEmail);
-            message.setTo(email);
-            message.setSubject("Traveler - Email Verification");
-            message.setText("Your email verification code is: " + verificationCode + 
-                          "\n\nThis code will expire in 5 minutes.\n\nIf you didn't request this, please ignore this email.");
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             
-            mailSender.send(message);
+            helper.setFrom(fromEmail);
+            helper.setTo(email);
+            helper.setSubject("Traveler - Email Verification");
+            
+            String htmlContent = buildVerificationEmailHtml(verificationCode);
+            helper.setText(htmlContent, true);
+            
+            mailSender.send(mimeMessage);
             log.info("Email verification sent successfully to {}", email);
         } catch (Exception e) {
             log.error("Error sending email verification to {}: {}", email, e.getMessage());
             throw new RuntimeException("Failed to send email verification", e);
         }
+    }
+
+    private String buildVerificationEmailHtml(String verificationCode) {
+        return "<html><body style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>" +
+               "<div style='background: linear-gradient(135deg, #0f766e, #134e4a); padding: 30px; text-align: center; color: white;'>" +
+               "<h1>🧳 Traveler</h1><p>Email Verification</p></div>" +
+               "<div style='padding: 30px;'>" +
+               "<h2>Verify Your Email Address</h2>" +
+               "<p>Thank you for joining Traveler! Please use the verification code below:</p>" +
+               "<div style='background: #f0fdfa; border: 2px solid #10b981; border-radius: 12px; padding: 20px; text-align: center; margin: 20px 0;'>" +
+               "<p style='color: #065f46; font-weight: bold; margin: 0;'>YOUR VERIFICATION CODE</p>" +
+               "<div style='font-size: 32px; font-weight: bold; color: #0f766e; letter-spacing: 4px; font-family: monospace; margin: 10px 0;'>" + verificationCode + "</div>" +
+               "<p style='color: #059669; font-size: 12px; margin: 0;'>Valid for 5 minutes</p>" +
+               "</div>" +
+               "<p style='color: #92400e; background: #fef3c7; padding: 15px; border-left: 4px solid #f59e0b;'>" +
+               "⚠️ This code will expire in 5 minutes for your security.</p>" +
+               "<p>If you didn't request this verification, please ignore this email.</p>" +
+               "</div>" +
+               "<div style='background: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;'>" +
+               "<p style='color: #6b7280; font-size: 14px;'>Need help? Contact us at support@traveler.com</p>" +
+               "<p style='color: #9ca3af; font-size: 12px;'>© 2026 Traveler. All rights reserved.</p>" +
+               "</div></body></html>";
     }
 
     @Transactional

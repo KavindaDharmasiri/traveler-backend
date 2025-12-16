@@ -28,6 +28,13 @@ spring:
             - Path=/notification/**
           filters:
             - PreserveHostHeader
+        - id: payment-service
+          uri: lb://traveler-payment
+          predicates:
+            - Path=/payment/**
+          filters:
+            - StripPrefix=1
+            - PreserveHostHeader
       discovery:
         locator:
           enabled: true
