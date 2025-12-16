@@ -17,7 +17,8 @@ import java.util.UUID;
 public class FileService {
 
     private final String uploadDir = "uploads/";
-    
+    private final String uploadDirProfile = "uploads/profile";
+
     @Autowired
     private FileRepository fileRepository;
 
@@ -41,5 +42,18 @@ public class FileService {
             return Files.readAllBytes(filePath);
         }
         throw new IOException("File not found");
+    }
+
+    public String uploadFileProfile(MultipartFile file) throws IOException {
+        Files.createDirectories(Paths.get(uploadDirProfile));
+        String uuid = UUID.randomUUID().toString();
+        String fileName = uuid + "_" + file.getOriginalFilename();
+        Path filePath = Paths.get(uploadDirProfile + fileName);
+        Files.write(filePath, file.getBytes());
+
+        FileEntity fileEntity = new FileEntity(uuid, file.getOriginalFilename(), filePath.toString());
+        fileRepository.save(fileEntity);
+
+        return uuid;
     }
 }

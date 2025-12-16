@@ -71,4 +71,30 @@ public class User {
     
     @Column(nullable = false, name = "tenant_id", unique = true)
     private String tenantId;
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", type=" + type +
+                ", name='" + name + '\'' +
+                ", gender='" + gender + '\'' +
+                ", googleMapsUrl='" + googleMapsUrl + '\'' +
+                ", contactNumber='" + contactNumber + '\'' +
+                ", isNumberVerified=" + isNumberVerified +
+                ", email='" + email + '\'' +
+                ", isEmailVerified=" + isEmailVerified +
+                ", password='" + password + '\'' +
+                ", country='" + country + '\'' +
+                ", profileImageUuid='" + profileImageUuid + '\'' +
+                ", dateOfBirth=" + dateOfBirth +
+                ", nicNumber='" + nicNumber + '\'' +
+                ", nicImageUuid='" + nicImageUuid + '\'' +
+                ", address=" + address +
+                ", bankDetails=" + bankDetails +
+                ", createdAt=" + createdAt +
+                ", isActive=" + isActive +
+                ", tenantId='" + tenantId + '\'' +
+                '}';
+    }
 }

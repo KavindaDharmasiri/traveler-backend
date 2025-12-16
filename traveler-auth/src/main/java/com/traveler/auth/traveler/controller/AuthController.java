@@ -3,14 +3,13 @@ package com.traveler.auth.traveler.controller;
 import com.traveler.auth.traveler.dto.*;
 import com.traveler.auth.traveler.service.AuthService;
 import com.traveler.auth.traveler.service.UserService;
+import com.traveler.auth.traveler.dto.ProfileUpdateDTO;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -99,4 +98,20 @@ public class AuthController {
         response.put("type", "PERCENTAGE");
         return ResponseEntity.ok(response);
     }
+
+    @PutMapping("/profile")
+    public ResponseEntity<?> updateProfile(
+            Authentication authentication,
+            @Valid @RequestBody ProfileUpdateDTO request) {
+        try {
+            UserResponse response = userService.updateProfile(request.getTenantId(), request);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+
+
 }

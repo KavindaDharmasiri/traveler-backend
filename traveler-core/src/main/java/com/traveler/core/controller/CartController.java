@@ -23,4 +23,9 @@ public class CartController {
     public ResponseEntity<List<CartDTO>> getCartItems() {
         return ResponseEntity.ok(cartService.getCartItems());
     }
+
+    @GetMapping("/count")
+    public ResponseEntity<Long> getCartCount() {
+        return ResponseEntity.ok(cartService.getCartCount());
+    }
 }

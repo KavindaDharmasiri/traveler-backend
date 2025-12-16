@@ -60,4 +60,13 @@ public class CartService {
             return dto;
         }).collect(Collectors.toList());
     }
+
+    public Long getCartCount() {
+        try {
+            return cartRepository.count();
+        }catch (Exception e){
+            System.err.println("Error fetching cart count: " + e.getMessage());
+            return 0L;
+        }
+    }
 }

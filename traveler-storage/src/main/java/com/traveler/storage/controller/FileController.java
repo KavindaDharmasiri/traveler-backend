@@ -34,4 +34,14 @@ public class FileController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @PostMapping("/upload/profile")
+    public ResponseEntity<String> uploadFileProfile(@RequestParam("file") MultipartFile file) {
+        try {
+            String uuid = fileService.uploadFileProfile(file);
+            return ResponseEntity.ok(uuid);
+        } catch (IOException e) {
+            return ResponseEntity.badRequest().body("Upload failed: " + e.getMessage());
+        }
+    }
 }
