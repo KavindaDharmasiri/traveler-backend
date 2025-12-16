@@ -31,7 +31,15 @@ public interface AuthClient {
     @GetMapping("/order/getAllForTraveller")
     ResponseEntity<Map<String, Object>> getAllForTraveller(
             @RequestParam("page") int page,
-            @RequestParam("size") int size);
+            @RequestParam("size") int size,
+            @RequestParam(value = "category", required = false) String category,
+            @RequestParam(value = "provider", required = false) String provider,
+            @RequestParam(value = "minPrice", required = false) Double minPrice,
+            @RequestParam(value = "maxPrice", required = false) Double maxPrice,
+            @RequestParam(value = "minRating", required = false) Double minRating);
+    
+    @GetMapping("/order/filters")
+    ResponseEntity<Map<String, Object>> getFilters();
 
     @GetMapping("/order/getItemForTraveler/{itemId}/{tenant}")
     ResponseEntity<ItemDTO> getItemForTraveler(@PathVariable("itemId") Long itemId,@PathVariable("tenant") String tenant);

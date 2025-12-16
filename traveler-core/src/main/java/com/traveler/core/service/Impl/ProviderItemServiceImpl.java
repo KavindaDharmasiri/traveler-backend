@@ -116,9 +116,19 @@ public class ProviderItemServiceImpl implements ProviderItemService {
     }
 
     @Override
-    public ResponseEntity<Map<String, Object>> getItemsForTraveller(int page, int size) {
+    public ResponseEntity<Map<String, Object>> getItemsForTraveller(int page, int size, String category, String provider, Double minPrice, Double maxPrice, Double minRating) {
         try{
-            return authClient.getAllForTraveller(page, size);
+            return authClient.getAllForTraveller(page, size, category, provider, minPrice, maxPrice, minRating);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    @Override
+    public ResponseEntity<Map<String, Object>> getFilters() {
+        try{
+            return authClient.getFilters();
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -235,6 +245,7 @@ public class ProviderItemServiceImpl implements ProviderItemService {
         dto.setContact(item.getContact());
         dto.setDescription(item.getDescription());
         dto.setPricePerDay(item.getPricePerDay());
+        dto.setOverallRating(item.getOverallRating());
         dto.setStatus(item.getStatus());
         dto.setCurrency(item.getCurrency());
         dto.setImages(List.of(item.getImages().split(",")));

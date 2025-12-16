@@ -49,8 +49,18 @@ public class providerItemController {
     @GetMapping("/getAllForTraveller")
     public ResponseEntity<Map<String, Object>> getItemsForTravellers(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "36") int size) {
-        return providerItemService.getItemsForTraveller(page, size);
+            @RequestParam(defaultValue = "36") int size,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String provider,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) Double minRating) {
+        return providerItemService.getItemsForTraveller(page, size, category, provider, minPrice, maxPrice, minRating);
+    }
+    
+    @GetMapping("/filters")
+    public ResponseEntity<Map<String, Object>> getFilters() {
+        return providerItemService.getFilters();
     }
 
     //api for feign auth client

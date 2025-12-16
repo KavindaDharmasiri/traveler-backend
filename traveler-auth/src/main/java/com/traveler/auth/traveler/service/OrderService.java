@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * ALL RIGHT RESERVED By kavinda_d
@@ -138,7 +139,7 @@ public class OrderService {
         }
     }
 
-    public ResponseEntity<Map<String, Object>> getAllForTraveller(int page, int size) {
+    public ResponseEntity<Map<String, Object>> getAllForTraveller(int page, int size, String category, String provider, Double minPrice, Double maxPrice, Double minRating) {
         try{
             List<User> allByTypeAndIsActive = userRepository.findAllByTypeAndIsActive(UserType.SERVICE_PROVIDER, true);
             List<ProviderItemGroupDTO> allProviders = new ArrayList<>();
@@ -163,14 +164,23 @@ public class OrderService {
                 allProviders.add(group);
             }
             
-            // Apply pagination to flattened items
-            int totalItems = allItems.size();
+            // Apply filters
+            List<ItemDetailsDTO> filteredItems = allItems.stream()
+                .filter(item -> category == null || category.equals(item.getCategory()))
+                .filter(item -> provider == null || provider.equals(item.getProviderName()))
+                .filter(item -> minPrice == null || item.getPricePerDay() >= minPrice)
+                .filter(item -> maxPrice == null || item.getPricePerDay() <= maxPrice)
+                .filter(item -> minRating == null || (item.getOverallRating() != null && item.getOverallRating() >= minRating))
+                .toList();
+            
+            // Apply pagination to filtered items
+            int totalItems = filteredItems.size();
             int totalPages = (int) Math.ceil((double) totalItems / size);
             int startIndex = page * size;
             int endIndex = Math.min(startIndex + size, totalItems);
             
             List<ItemDetailsDTO> paginatedItems = startIndex < totalItems ? 
-                allItems.subList(startIndex, endIndex) : new ArrayList<>();
+                filteredItems.subList(startIndex, endIndex) : new ArrayList<>();
             
             Map<String, Object> response = new HashMap<>();
             response.put("items", paginatedItems);
@@ -181,6 +191,30 @@ public class OrderService {
             response.put("pageSize", size);
             
             return ResponseEntity.ok(response);
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    public ResponseEntity<Map<String, Object>> getFilters() {
+        try{
+            List<User> providers = userRepository.findAllByTypeAndIsActive(UserType.SERVICE_PROVIDER, true);
+            List<String> providerNames = providers.stream().map(User::getName).distinct().sorted().toList();
+            
+            // Get categories from all providers
+            Set<String> categoriesSet = new HashSet<>();
+            for (User user : providers) {
+                List<ItemDetailsDTO> items = coreClient.getItemsForTraveller(user.getTenantId());
+                categoriesSet.addAll(items.stream().map(ItemDetailsDTO::getCategory).collect(Collectors.toSet()));
+            }
+            List<String> categories = categoriesSet.stream().sorted().toList();
+            
+            Map<String, Object> filters = new HashMap<>();
+            filters.put("categories", categories);
+            filters.put("providers", providerNames);
+            
+            return ResponseEntity.ok(filters);
         }catch (Exception e){
             e.printStackTrace();
             return null;

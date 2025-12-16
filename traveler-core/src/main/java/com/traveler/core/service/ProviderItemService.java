@@ -27,7 +27,9 @@ public interface ProviderItemService {
 
     ResponseEntity<String> deleteItem(Long itemId);
 
-    ResponseEntity<Map<String, Object>> getItemsForTraveller(int page, int size);
+    ResponseEntity<Map<String, Object>> getItemsForTraveller(int page, int size, String category, String provider, Double minPrice, Double maxPrice, Double minRating);
+    
+    ResponseEntity<Map<String, Object>> getFilters();
 
     List<ItemDetailsDTO> getItemsForTravellers();
 

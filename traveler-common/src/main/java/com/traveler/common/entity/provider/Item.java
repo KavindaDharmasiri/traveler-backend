@@ -41,6 +41,9 @@ public class Item {
     @Column(name = "price_per_day")
     private double pricePerDay;
     
+    @Column(name = "overall_rating")
+    private Double overallRating = 0.0;
+    
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicle_details_id")
     private VehicleDetails vehicleDetails;
@@ -138,6 +141,14 @@ public class Item {
     
     public void setHotelDetails(HotelDetails hotelDetails) {
         this.hotelDetails = hotelDetails;
+    }
+    
+    public Double getOverallRating() {
+        return overallRating;
+    }
+    
+    public void setOverallRating(Double overallRating) {
+        this.overallRating = overallRating;
     }
     
 //    public List<ItemReview> getReviews() {

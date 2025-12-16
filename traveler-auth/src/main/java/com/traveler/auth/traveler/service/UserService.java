@@ -4,11 +4,13 @@ import com.traveler.auth.traveler.dto.*;
 import com.traveler.auth.traveler.entity.User;
 import com.traveler.auth.traveler.repository.UserRepository;
 import com.traveler.auth.traveler.dto.ProfileUpdateDTO;
+import com.traveler.auth.traveler.utils.UserType;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -227,6 +229,11 @@ public class UserService implements UserDetailsService {
 
         userRepository.save(user);
         return getCurrentUser(user.getEmail());
+    }
+    
+    public List<String> getProviders() {
+        List<User> providers = userRepository.findAllByTypeAndIsActive(UserType.SERVICE_PROVIDER, true);
+        return providers.stream().map(User::getName).distinct().sorted().toList();
     }
     
     private String normalizePhoneNumber(String phoneNumber) {
