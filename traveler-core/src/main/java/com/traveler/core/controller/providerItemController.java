@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/provider/item")
@@ -46,8 +47,10 @@ public class providerItemController {
     /////for traveller
 //api for postman
     @GetMapping("/getAllForTraveller")
-    public ResponseEntity<List<ProviderItemGroupDTO>> getItemsForTravellers() {
-        return providerItemService.getItemsForTraveller();
+    public ResponseEntity<Map<String, Object>> getItemsForTravellers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "36") int size) {
+        return providerItemService.getItemsForTraveller(page, size);
     }
 
     //api for feign auth client

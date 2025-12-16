@@ -14,10 +14,7 @@ import com.traveler.common.entity.Order;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * ALL RIGHT RESERVED By kavinda_d
@@ -141,25 +138,49 @@ public class OrderService {
         }
     }
 
-    public ResponseEntity<List<ProviderItemGroupDTO>> getAllForTraveller() {
+    public ResponseEntity<Map<String, Object>> getAllForTraveller(int page, int size) {
         try{
             List<User> allByTypeAndIsActive = userRepository.findAllByTypeAndIsActive(UserType.SERVICE_PROVIDER, true);
-            List<ProviderItemGroupDTO> result = new ArrayList<>();
+            List<ProviderItemGroupDTO> allProviders = new ArrayList<>();
+            
+            // Collect all items from all providers
+            List<ItemDetailsDTO> allItems = new ArrayList<>();
             for (User user : allByTypeAndIsActive) {
-                System.out.println("Fetching orders for traveller tenant: " + user.getTenantId());
-                List<ItemDetailsDTO> itemDetailsDTOS = new ArrayList<>();
                 List<ItemDetailsDTO> response = coreClient.getItemsForTraveller(user.getTenantId());
-
+                
+                // Add provider info to each item
+                for (ItemDetailsDTO item : response) {
+                    item.setProviderName(user.getName());
+                    item.setTenant(user.getTenantId());
+                }
+                allItems.addAll(response);
+                
                 ProviderItemGroupDTO group = new ProviderItemGroupDTO(
                         user.getTenantId(),
                         user.getName(),
                         response
                 );
-
-                result.add(group);
-
+                allProviders.add(group);
             }
-            return ResponseEntity.ok(result);
+            
+            // Apply pagination to flattened items
+            int totalItems = allItems.size();
+            int totalPages = (int) Math.ceil((double) totalItems / size);
+            int startIndex = page * size;
+            int endIndex = Math.min(startIndex + size, totalItems);
+            
+            List<ItemDetailsDTO> paginatedItems = startIndex < totalItems ? 
+                allItems.subList(startIndex, endIndex) : new ArrayList<>();
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("items", paginatedItems);
+            response.put("providers", allProviders);
+            response.put("currentPage", page);
+            response.put("totalPages", totalPages);
+            response.put("totalItems", totalItems);
+            response.put("pageSize", size);
+            
+            return ResponseEntity.ok(response);
         }catch (Exception e){
             e.printStackTrace();
             return null;

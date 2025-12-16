@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @FeignClient(name = "traveler-auth", configuration = com.traveler.core.config.FeignConfig.class)
 public interface AuthClient {
@@ -28,7 +29,9 @@ public interface AuthClient {
     ResponseEntity<OrderDTO> getOrder(@PathVariable("orderId") Long orderId);
 
     @GetMapping("/order/getAllForTraveller")
-    ResponseEntity<List<ProviderItemGroupDTO>> getAllForTraveller();
+    ResponseEntity<Map<String, Object>> getAllForTraveller(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size);
 
     @GetMapping("/order/getItemForTraveler/{itemId}/{tenant}")
     ResponseEntity<ItemDTO> getItemForTraveler(@PathVariable("itemId") Long itemId,@PathVariable("tenant") String tenant);

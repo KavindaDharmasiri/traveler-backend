@@ -19,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/order")
@@ -63,8 +64,10 @@ public class OrderController {
 
 
     @GetMapping("/getAllForTraveller")
-    public ResponseEntity<List<ProviderItemGroupDTO>> getAllForTraveller() {
-        return orderService.getAllForTraveller();
+    public ResponseEntity<Map<String, Object>> getAllForTraveller(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "36") int size) {
+        return orderService.getAllForTraveller(page, size);
     }
 
     @GetMapping("/getItemForTraveler/{itemId}/{tenant}")

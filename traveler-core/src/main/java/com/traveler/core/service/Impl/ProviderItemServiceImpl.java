@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -115,9 +116,9 @@ public class ProviderItemServiceImpl implements ProviderItemService {
     }
 
     @Override
-    public ResponseEntity<List<ProviderItemGroupDTO>> getItemsForTraveller() {
+    public ResponseEntity<Map<String, Object>> getItemsForTraveller(int page, int size) {
         try{
-            return authClient.getAllForTraveller();
+            return authClient.getAllForTraveller(page, size);
         }catch (Exception e){
             e.printStackTrace();
         }

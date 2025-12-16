@@ -6,6 +6,7 @@ import com.traveler.common.dto.traveller.ProviderItemGroupDTO;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * ALL RIGHT RESERVED By kavinda_d
@@ -26,7 +27,7 @@ public interface ProviderItemService {
 
     ResponseEntity<String> deleteItem(Long itemId);
 
-    ResponseEntity<List<ProviderItemGroupDTO>> getItemsForTraveller();
+    ResponseEntity<Map<String, Object>> getItemsForTraveller(int page, int size);
 
     List<ItemDetailsDTO> getItemsForTravellers();
 
