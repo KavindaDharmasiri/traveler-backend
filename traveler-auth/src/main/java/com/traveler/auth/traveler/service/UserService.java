@@ -48,6 +48,8 @@ public class UserService implements UserDetailsService {
         response.setNicImageUuid(user.getNicImageUuid());
         response.setTenantId(user.getTenantId());
         response.setProfileImageUuid(user.getProfileImageUuid());
+        response.setCountry(user.getCountry());
+        response.setGoogleMapsUrl(user.getGoogleMapsUrl());
 
         if (user.getAddress() != null) {
             AddressDto addressDto = new AddressDto();
