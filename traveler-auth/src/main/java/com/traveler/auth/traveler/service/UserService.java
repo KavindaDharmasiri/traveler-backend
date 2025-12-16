@@ -89,4 +89,34 @@ public class UserService implements UserDetailsService {
             throw new RuntimeException("User not found for tenant: " + tenant);
         }
     }
+
+    public void updatePhoneVerificationStatus(String tenantId, String phoneNumber) {
+        try{
+         userRepository.findByTenantId(tenantId).ifPresent(user -> {
+             if (user.getContactNumber().equals(phoneNumber)) {
+                 user.setIsNumberVerified(true);
+                 userRepository.save(user);
+             } else {
+                 throw new RuntimeException("Phone number does not match for tenant: " + tenantId);
+             }
+         });
+        }catch (Exception e){
+            throw new RuntimeException("Failed to update phone verification status");
+        }
+    }
+
+    public void updateEmailVerificationStatus(String tenantId, String email) {
+        try{
+            userRepository.findByTenantId(tenantId).ifPresent(user -> {
+                if (user.getEmail().equals(email)) {
+                    user.setIsEmailVerified(true);
+                    userRepository.save(user);
+                } else {
+                    throw new RuntimeException("email does not match for tenant: " + tenantId);
+                }
+            });
+        }catch (Exception e){
+            throw new RuntimeException("Failed to update email verification status");
+        }
+    }
 }

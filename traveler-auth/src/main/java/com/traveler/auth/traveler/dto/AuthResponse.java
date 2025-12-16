@@ -13,4 +13,6 @@ public class AuthResponse {
     private String type;
     private String tenantId;
     private String country;
+    private boolean numberVerified;
+    private boolean emailVerified;
 }

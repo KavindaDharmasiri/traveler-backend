@@ -12,3 +12,23 @@ spring:
       connection-timeout: 20000
       idle-timeout: 300000
       max-lifetime: 1200000
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_USERNAME:your-email@gmail.com}
+    password: ${EMAIL_PASSWORD:your-app-password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+whatsapp:
+  api:
+    url: https://graph.facebook.com/v18.0
+  phone:
+    number:
+      id: ${WHATSAPP_PHONE_NUMBER_ID:YOUR_PHONE_NUMBER_ID}
+  access:
+    token: ${WHATSAPP_ACCESS_TOKEN:YOUR_ACCESS_TOKEN}

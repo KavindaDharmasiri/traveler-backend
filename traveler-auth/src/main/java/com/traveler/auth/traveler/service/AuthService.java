@@ -58,10 +58,10 @@ public class AuthService {
 //        user.setUniqIdentifier(request.getNicNumber());
         user.setNicImageUuid(request.getNicImageUuid());
         user.setTenantId(generateTenantId(request.getNicNumber()));
-        user.setIsEmailVerified(true);
+        user.setIsEmailVerified(false);
         user.setCountry(request.getCountry());
         user.setGoogleMapsUrl(request.getGoogleMapsUrl());
-        user.setIsNumberVerified(true);
+        user.setIsNumberVerified(false);
 
         Address address = new Address();
         address.setStreet1(request.getAddress().getStreet1());
@@ -189,6 +189,8 @@ public class AuthService {
         response.setType(String.valueOf(user.getType()));
         response.setTenantId(user.getTenantId());
         response.setCountry(user.getCountry());
+        response.setNumberVerified(user.getIsNumberVerified());
+        response.setEmailVerified(user.getIsEmailVerified());
 
         return response;
     }

@@ -1,0 +1,13 @@
+package com.traveler.common.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class EmailVerificationConfirmDTO {
+    private String email;
+    private String verificationCode;
+}
