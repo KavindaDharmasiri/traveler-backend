@@ -195,6 +195,7 @@ public class ProviderItemServiceImpl implements ProviderItemService {
         dto.setPricePerDay(item.getPricePerDay());
         dto.setStatus(item.getStatus());
         dto.setCurrency(item.getCurrency());
+        dto.setOverallRating(item.getOverallRating());
         dto.setImages(List.of(item.getImages().split(",")));
         
         // Convert vehicle details if present
@@ -219,20 +220,20 @@ public class ProviderItemServiceImpl implements ProviderItemService {
             dto.setHotelDetails(hotelDTO);
         }
 
-//        if (item.getReviews() != null) {
-//            List<ItemReviewDTO> itemReviewDTOS = new ArrayList<>();
-//            item.getReviews().forEach(review -> {
-//               ItemReviewDTO itemReviewDTO = new ItemReviewDTO();
-//               itemReviewDTO.setTravelerTenant(review.getTravelerTenant());
-//               itemReviewDTO.setReviewText(review.getReviewText());
-//               itemReviewDTO.setRating(review.getRating());
-//               itemReviewDTO.setCreatedAt(review.getCreatedAt());
-//
-//               itemReviewDTOS.add(itemReviewDTO);
-//            });
+        if (item.getReviews() != null) {
+            List<ItemReviewDTO> itemReviewDTOS = new ArrayList<>();
+            item.getReviews().forEach(review -> {
+               ItemReviewDTO itemReviewDTO = new ItemReviewDTO();
+               itemReviewDTO.setTravelerTenant(review.getTravelerTenant());
+               itemReviewDTO.setReviewText(review.getReviewText());
+               itemReviewDTO.setRating(review.getRating());
+               itemReviewDTO.setCreatedAt(review.getCreatedAt());
 
-//            dto.setReviews(itemReviewDTOS);
-//        }
+               itemReviewDTOS.add(itemReviewDTO);
+            });
+
+            dto.setReviews(itemReviewDTOS);
+        }
         
         return dto;
     }

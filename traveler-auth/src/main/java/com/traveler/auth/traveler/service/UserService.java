@@ -89,6 +89,7 @@ public class UserService implements UserDetailsService {
             response.setNicNumber(user.getNicNumber());
             response.setNicImageUuid(user.getNicImageUuid());
             response.setTenantId(user.getTenantId());
+            response.setGoogleMapsUrl(user.getGoogleMapsUrl());
             return response;
         } catch (Exception e){
             throw new RuntimeException("User not found for tenant: " + tenant);

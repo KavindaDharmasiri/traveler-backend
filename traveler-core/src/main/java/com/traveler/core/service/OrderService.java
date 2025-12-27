@@ -2,6 +2,9 @@ package com.traveler.core.service;
 
 import com.traveler.common.dto.BulkOrderStatusUpdateDTO;
 import com.traveler.common.dto.OrderDTO;
+import com.traveler.common.dto.OrderWithItemsDTO;
+import com.traveler.common.entity.Backpack;
+import com.traveler.common.entity.Order;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -15,9 +18,9 @@ import java.util.Map;
  */
 
 public interface OrderService {
-    ResponseEntity<String> createOrder(OrderDTO orderDTO);
+    ResponseEntity<String> createOrder(Order orderDTO, Backpack backPack);
 
-    ResponseEntity<String> createOrderWithSup(OrderDTO orderDTO);
+    ResponseEntity<String> createOrderWithSup(List<OrderDTO> orderDTOs);
 
     ResponseEntity<Map<String, Map<String, List<OrderDTO>>>> findAllOrders();
 
@@ -30,4 +33,10 @@ public interface OrderService {
     ResponseEntity<String> updateStatusWithSup(BulkOrderStatusUpdateDTO updateDTO);
 
     ResponseEntity<String> bulkUpdateOrderStatus(String orderCode, String status);
+
+    ResponseEntity<OrderWithItemsDTO> findOrderByCode(String orderCode);
+
+    ResponseEntity<String> updateStatusSingle(Long orderId, Long itemId, String status);
+
+    ResponseEntity<String> authUpdatStatus(String orderId, String itemId, String status);
 }

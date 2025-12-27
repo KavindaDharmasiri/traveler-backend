@@ -2,10 +2,13 @@ package com.traveler.core.service.feign;
 
 import com.traveler.common.dto.BulkOrderStatusUpdateDTO;
 import com.traveler.common.dto.OrderDTO;
+import com.traveler.common.dto.SaveOrderDTO;
 import com.traveler.common.dto.UserResponse;
 import com.traveler.common.dto.provider.ItemDTO;
 import com.traveler.common.dto.traveller.ItemDetailsDTO;
 import com.traveler.common.dto.traveller.ProviderItemGroupDTO;
+import com.traveler.common.entity.Backpack;
+import com.traveler.common.entity.Order;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +23,7 @@ public interface AuthClient {
     String validateToken(@RequestHeader("Authorization") String token);
 
     @PostMapping("/order")
-    String saveOrder(@RequestBody OrderDTO orderDTO);
+    String saveOrder(@RequestBody SaveOrderDTO saveOrderDTO);
 
     @GetMapping("/order")
     ResponseEntity<List<OrderDTO>> getOrders();
@@ -47,6 +50,7 @@ public interface AuthClient {
     @GetMapping("/auth/user")
     UserResponse getUserByTenant(@RequestParam("tenant") String tenant);
 
-    @PutMapping("/order/changeStatus")
-    String updateOrderStatus(@RequestBody BulkOrderStatusUpdateDTO updateDTO);
+    @PostMapping("/order/changeStatus")
+    String updateOrderStatus(@RequestBody Map map);
+
 }

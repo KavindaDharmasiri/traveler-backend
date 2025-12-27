@@ -3,14 +3,18 @@ package com.traveler.auth.traveler.service;
 import com.traveler.auth.traveler.entity.User;
 import com.traveler.auth.traveler.feignClient.CoreClient;
 import com.traveler.auth.traveler.repository.OrderRepository;
+import com.traveler.auth.traveler.repository.OrderItemsRepository;
 import com.traveler.auth.traveler.repository.UserRepository;
 import com.traveler.auth.traveler.utils.UserType;
-import com.traveler.common.dto.BulkOrderStatusUpdateDTO;
 import com.traveler.common.dto.OrderDTO;
+import com.traveler.common.dto.SeparateSaveOrderDTO;
 import com.traveler.common.dto.provider.ItemDTO;
 import com.traveler.common.dto.traveller.ItemDetailsDTO;
 import com.traveler.common.dto.traveller.ProviderItemGroupDTO;
+import com.traveler.common.entity.Backpack;
 import com.traveler.common.entity.Order;
+import com.traveler.common.entity.OrderItems;
+import com.traveler.common.utils.STATUS;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -28,32 +32,36 @@ import java.util.stream.Collectors;
 public class OrderService {
     private final CoreClient coreClient;
     private final OrderRepository orderRepository;
+    private final OrderItemsRepository orderItemsRepository;
     private final UserRepository userRepository;
 
-    public OrderService(CoreClient coreClient, OrderRepository orderRepository, UserRepository userRepository) {
+    public OrderService(CoreClient coreClient, OrderRepository orderRepository, OrderItemsRepository orderItemsRepository, UserRepository userRepository) {
         this.coreClient = coreClient;
         this.orderRepository = orderRepository;
+        this.orderItemsRepository = orderItemsRepository;
         this.userRepository = userRepository;
     }
 
-    public ResponseEntity<String> createOrder(OrderDTO orderDTO) {
+    public ResponseEntity<String> createOrder(Order mainOrder, List<Backpack> backpacks) {
         try {
-            if (orderDTO.getOrderCode() == null || orderDTO.getOrderCode().isEmpty()) {
-                orderDTO.setOrderCode(createCode());
-            }
-            coreClient.createOrder(orderDTO, orderDTO.getProviderTenant());
-            coreClient.createOrder(orderDTO,orderDTO.getClientTenant());
+            backpacks.forEach(backpack -> {
+                SeparateSaveOrderDTO saveOrderDTO = new SeparateSaveOrderDTO();
+                saveOrderDTO.setOrder(mainOrder);
+                saveOrderDTO.setBackpacks(backpack);
+                coreClient.createOrder(saveOrderDTO, backpack.getProviderTenant());
+                coreClient.createOrder(saveOrderDTO, mainOrder.getClientTenant());
+            });
 
 
-        createOrderForAdmin(orderDTO);
-        return ResponseEntity.ok("Order created successfully in both tenants");
+            createOrderForAdmin(mainOrder,backpacks);
+            return ResponseEntity.ok("Order created successfully in both tenants");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body("Failed to create order in one or both tenants");
         }
     }
 
-    private void createOrderForAdmin(OrderDTO orderDTO) {
+    private void createOrderForAdmin(Order orderDTO, List<Backpack> backpacks) {
         try {
             Optional<Order> existingOrder = orderRepository.findByOrderCode(orderDTO.getOrderCode());
             Order order;
@@ -61,22 +69,30 @@ public class OrderService {
                 order = existingOrder.get();
             } else {
                 order = new Order();
+                order.setCustomerName(orderDTO.getCustomerName());
+                order.setOrderCode(orderDTO.getOrderCode());
+                if (orderDTO.getStatus() == null){
+                    order.setStatus(com.traveler.common.utils.STATUS.PENDING);
+                }else {
+                    order.setStatus(orderDTO.getStatus());
+                }
+                order.setClientTenant(orderDTO.getClientTenant());
+                order = orderRepository.save(order);
             }
 
-            order.setCustomerName(orderDTO.getCustomerName());
-            order.setOrderCode(orderDTO.getOrderCode());
-            order.setItem(orderDTO.getItem());
-            if (orderDTO.getStatus() == null){
-                order.setStatus(com.traveler.common.utils.STATUS.PENDING);
-            }else {
-                order.setStatus(orderDTO.getStatus());
+            for (Backpack backpack : backpacks) {
+                OrderItems orderItem = new OrderItems();
+                orderItem.setOrder(order);
+                orderItem.setItem(Math.toIntExact(backpack.getItemId()));
+                orderItem.setTotalPrice(backpack.getTotalPrice().doubleValue());
+                orderItem.setRentalDays(backpack.getRentalDays());
+                orderItem.setProviderTenant(backpack.getProviderTenant());
+                orderItem.setPickupDate(backpack.getPickupDate());
+                orderItem.setReturnDate(backpack.getReturnDate());
+                orderItem.setBagCode(backpack.getCode());
+                orderItem.setStatus(STATUS.PENDING);
+                orderItemsRepository.save(orderItem);
             }
-
-            order.setTotalPrice(orderDTO.getTotalPrice());
-            order.setRentalDays(orderDTO.getRentalDays());
-            order.setClientTenant(orderDTO.getClientTenant());
-            order.setProviderTenant(orderDTO.getProviderTenant());
-            orderRepository.save(order);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -100,6 +116,8 @@ public class OrderService {
                 dto.setRentalDays(order.getRentalDays());
                 dto.setClientTenant(order.getClientTenant());
                 dto.setProviderTenant(order.getProviderTenant());
+                dto.setPickupDate(order.getPickupDate().toString());
+                dto.setReturnDate(order.getReturnDate().toString());
                 return dto;
             }).toList();
             return ResponseEntity.ok(orderDTOs);
@@ -230,18 +248,29 @@ public class OrderService {
         }
     }
 
-    public ResponseEntity<String> changeStatus(BulkOrderStatusUpdateDTO bulkOrderStatusUpdateDTO) {
+    public ResponseEntity<String> changeStatus(String orderId, String itemId, String status, String tenant) {
         try{
-            bulkOrderStatusUpdateDTO.getOrderCodes().stream().forEach(orderCode -> {
-                Optional<Order> orderOpt = orderRepository.findByOrderCode(orderCode);
+            Map map = new HashMap();
+            map.put("orderId", orderId);
+            map.put("itemId", itemId);
+            map.put("status", status);
+            coreClient.updateOrderStatus(map, tenant);
+
+            if (itemId != null) {
+                Optional<OrderItems> orderItemOpt = orderItemsRepository.findByBagCode(itemId);
+                if (orderItemOpt.isPresent()) {
+                    OrderItems orderItem = orderItemOpt.get();
+                    orderItem.setStatus(STATUS.valueOf(status));
+                    orderItemsRepository.save(orderItem);
+                }
+            } else {
+                Optional<Order> orderOpt = orderRepository.findByOrderCode(orderId);
                 if (orderOpt.isPresent()) {
                     Order order = orderOpt.get();
-                    coreClient.updateStatus(order.getOrderCode(), bulkOrderStatusUpdateDTO.getStatus().name(), order.getClientTenant());
-                    coreClient.updateStatus(order.getOrderCode(), bulkOrderStatusUpdateDTO.getStatus().name(), order.getProviderTenant());
-                    order.setStatus(bulkOrderStatusUpdateDTO.getStatus());
+                    order.setStatus(STATUS.valueOf(status));
                     orderRepository.save(order);
                 }
-            });
+            }
             return ResponseEntity.ok("Status updated successfully");
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -2,7 +2,11 @@ package com.traveler.core.controller;
 
 import com.traveler.common.dto.BulkOrderStatusUpdateDTO;
 import com.traveler.common.dto.OrderDTO;
+import com.traveler.common.dto.OrderWithItemsDTO;
+import com.traveler.common.dto.SeparateSaveOrderDTO;
 import com.traveler.common.dto.provider.ItemDTO;
+import com.traveler.common.entity.Backpack;
+import com.traveler.common.entity.Order;
 import com.traveler.core.service.OrderService;
 import com.traveler.core.service.ProviderItemService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +24,13 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping()
-    public ResponseEntity<String> createOrder(@RequestBody OrderDTO orderDTO) {
-        return orderService.createOrder(orderDTO);
+    public ResponseEntity<String> createOrder(@RequestBody SeparateSaveOrderDTO saveOrderDTO) {
+        return orderService.createOrder(saveOrderDTO.getOrder(), saveOrderDTO.getBackpacks());
     }
 
     @PostMapping("/create")
-    public ResponseEntity<String> createOrderWithSup(@RequestBody OrderDTO orderDTO) {
-        return orderService.createOrderWithSup(orderDTO);
+    public ResponseEntity<String> createOrderWithSup(@RequestBody List<OrderDTO> orderDTOs) {
+        return orderService.createOrderWithSup(orderDTOs);
     }
 
     @GetMapping()
@@ -49,6 +53,11 @@ public class OrderController {
         return orderService.getOrderFromAdmin(orderId);
     }
 
+    @GetMapping("/code/{orderCode}")
+    public ResponseEntity<OrderWithItemsDTO> getOrderByCode(@PathVariable String orderCode) {
+        return orderService.findOrderByCode(orderCode);
+    }
+
     @PutMapping("/updateStatus")
     public ResponseEntity<String> updateStatusWithSup(@RequestBody BulkOrderStatusUpdateDTO updateDTO) {
         return orderService.updateStatusWithSup(updateDTO);
@@ -57,6 +66,20 @@ public class OrderController {
     @PutMapping("/bulk-update-status/{orderCode}/{status}")
     public ResponseEntity<String> bulkUpdateOrderStatus(@PathVariable String orderCode, @PathVariable String status, @RequestHeader(required = false) String clientTenant) {
         return orderService.bulkUpdateOrderStatus(orderCode, status);
+    }
+
+    @PutMapping("/updateStatusSingle/{orderId}/{itemId}/{status}")
+    public ResponseEntity<String> updateStatusSingle(@PathVariable Long orderId, @PathVariable String itemId, @PathVariable String status) {
+        Long itemIdLong = "null".equals(itemId) ? null : Long.parseLong(itemId);
+        return orderService.updateStatusSingle(orderId, itemIdLong, status);
+    }
+
+    @PostMapping("/auth-update-status")
+    public ResponseEntity<String> authUpdatStatus(@RequestBody Map<String, String> map) {
+        String orderId = map.get("orderId");
+        String itemId = map.get("itemId");
+        String status = map.get("status");
+        return orderService.authUpdatStatus(orderId, itemId, status);
     }
 
 }

@@ -27,6 +27,7 @@ public class ItemDTO {
     private double pricePerDay;
     private VehicleDetailsDTO vehicleDetails;
     private HotelDetailsDTO hotelDetails;
+    private Double OverallRating;
 
     private List<ItemReviewDTO> reviews;
 }

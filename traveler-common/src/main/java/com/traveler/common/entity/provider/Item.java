@@ -52,8 +52,8 @@ public class Item {
     @JoinColumn(name = "hotel_details_id")
     private HotelDetails hotelDetails;
     
-//    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    private List<ItemReview> reviews = new ArrayList<>();
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ItemReview> reviews = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -151,11 +151,11 @@ public class Item {
         this.overallRating = overallRating;
     }
     
-//    public List<ItemReview> getReviews() {
-//        return reviews;
-//    }
-//
-//    public void setReviews(List<ItemReview> reviews) {
-//        this.reviews = reviews;
-//    }
+    public List<ItemReview> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<ItemReview> reviews) {
+        this.reviews = reviews;
+    }
 }

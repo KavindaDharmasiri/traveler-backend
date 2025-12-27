@@ -11,8 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,11 +38,19 @@ public class OrderTimeoutService {
                 .map(Order::getOrderCode)
                 .collect(Collectors.toList());
 
-            if (!expiredOrderCodes.isEmpty()) {
-                BulkOrderStatusUpdateDTO updateDTO = new BulkOrderStatusUpdateDTO();
-                updateDTO.setOrderCodes(expiredOrderCodes);
-                updateDTO.setStatus(STATUS.CANCELLED);
-                authClient.updateOrderStatus(updateDTO);
+
+            if (expiredOrderCodes != null && !expiredOrderCodes.isEmpty()) {
+                expiredOrderCodes.forEach(code ->{
+                    Optional<Order> byOrderCode = orderRepository.findByOrderCode(code);
+                    Map map = new HashMap();
+                    map.put("orderId", byOrderCode.get().getOrderCode());
+                    map.put("itemId", null);
+                    map.put("status", STATUS.CANCELLED.name());
+                    map.put("tenant", byOrderCode.get().getClientTenant());
+                    authClient.updateOrderStatus(map);
+                    authClient.updateOrderStatus(map);
+                });
+
             }
         } catch (Exception e) {
             System.err.println("Order timeout check error: " + e.getMessage());

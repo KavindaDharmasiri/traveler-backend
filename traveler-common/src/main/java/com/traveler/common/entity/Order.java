@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 /**
@@ -45,6 +46,10 @@ public class Order {
     private String clientTenant;
     @Column(name = "provider_tenant")
     private String providerTenant;
+    @Column(name = "pickup_date")
+    private LocalDate pickupDate;
+    @Column(name = "return_date")
+    private LocalDate returnDate;
 
     public Long getId() {
         return id;
@@ -134,4 +139,19 @@ public class Order {
         this.providerTenant = providerTenant;
     }
 
+    public LocalDate getPickupDate() {
+        return pickupDate;
+    }
+
+    public void setPickupDate(LocalDate pickupDate) {
+        this.pickupDate = pickupDate;
+    }
+
+    public LocalDate getReturnDate() {
+        return returnDate;
+    }
+
+    public void setReturnDate(LocalDate returnDate) {
+        this.returnDate = returnDate;
+    }
 }

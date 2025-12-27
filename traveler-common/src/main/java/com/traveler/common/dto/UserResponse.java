@@ -20,4 +20,5 @@ public class UserResponse {
     private String nicNumber;
     private String nicImageUuid;
     private String tenantId;
+    private String googleMapsUrl;
 }

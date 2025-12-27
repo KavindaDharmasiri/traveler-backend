@@ -9,9 +9,12 @@ import com.traveler.auth.traveler.service.OrderService;
 import com.traveler.auth.traveler.service.UserService;
 import com.traveler.common.dto.BulkOrderStatusUpdateDTO;
 import com.traveler.common.dto.OrderDTO;
+import com.traveler.common.dto.SaveOrderDTO;
 import com.traveler.common.dto.provider.ItemDTO;
 import com.traveler.common.dto.traveller.ItemDetailsDTO;
 import com.traveler.common.dto.traveller.ProviderItemGroupDTO;
+import com.traveler.common.entity.Backpack;
+import com.traveler.common.entity.Order;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -34,13 +37,17 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping()
-    public ResponseEntity<String> createOrder( @RequestBody OrderDTO orderDTO) {
-        return orderService.createOrder(orderDTO);
+    public ResponseEntity<String> createOrder(@RequestBody SaveOrderDTO saveOrderDTO) {
+        return orderService.createOrder(saveOrderDTO.getOrder(),saveOrderDTO.getBackpacks());
     }
 
-    @PutMapping("/changeStatus")
-    public ResponseEntity<String> changeStatus( @RequestBody BulkOrderStatusUpdateDTO bulkOrderStatusUpdateDTO) {
-        return orderService.changeStatus(bulkOrderStatusUpdateDTO);
+    @PostMapping("/changeStatus")
+    public ResponseEntity<String> changeStatus(@RequestBody Map<String, String> map) {
+        String orderId = map.get("orderId");
+        String itemId = map.get("itemId");
+        String status = map.get("status");
+        String tenant = map.get("tenant");
+        return orderService.changeStatus(orderId, itemId, status, tenant);
     }
 
     @GetMapping()

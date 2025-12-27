@@ -1,5 +1,6 @@
 package com.traveler.common.dto;
 
+import com.traveler.common.dto.provider.ItemDTO;
 import com.traveler.common.entity.provider.Item;
 import com.traveler.common.utils.STATUS;
 import jakarta.persistence.*;
@@ -18,6 +19,7 @@ public class OrderDTO {
     private String orderCode;
     private String customerName;
     private int item;
+    private ItemDTO itemObj;
     private STATUS status;
     private double totalPrice;
     private int rentalDays;
@@ -25,6 +27,10 @@ public class OrderDTO {
     private String providerTenant;
     private String groupTenant;
     private String groupName;
+    private String pickupDate;
+    private String returnDate;
+    private String providerName;
+    private String map;
 
     public Long getId() {
         return id;
@@ -112,5 +118,45 @@ public class OrderDTO {
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
+    }
+
+    public ItemDTO getItemObj() {
+        return itemObj;
+    }
+
+    public void setItemObj(ItemDTO itemObj) {
+        this.itemObj = itemObj;
+    }
+
+    public String getPickupDate() {
+        return pickupDate;
+    }
+
+    public void setPickupDate(String pickupDate) {
+        this.pickupDate = pickupDate;
+    }
+
+    public String getReturnDate() {
+        return returnDate;
+    }
+
+    public void setReturnDate(String returnDate) {
+        this.returnDate = returnDate;
+    }
+
+    public String getProviderName() {
+        return providerName;
+    }
+
+    public void setProviderName(String providerName) {
+        this.providerName = providerName;
+    }
+
+    public String getMap() {
+        return map;
+    }
+
+    public void setMap(String map) {
+        this.map = map;
     }
 }
