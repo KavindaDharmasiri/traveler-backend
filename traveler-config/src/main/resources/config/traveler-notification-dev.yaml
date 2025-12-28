@@ -1,16 +1,18 @@
 server:
-  port: 8085
+  port: 8086
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/traveler_auth
+    url: jdbc:mysql://localhost:3306/traveler_notification?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
     username: root
     password: root1234
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 5
       minimum-idle: 2
-      connection-timeout: 30000
+      connection-timeout: 20000
+      idle-timeout: 300000
+      max-lifetime: 1200000
   jpa:
     hibernate:
       ddl-auto: update
@@ -18,6 +20,29 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_USERNAME:kavindadarmasiri15@gmail.com}
+    password: ${EMAIL_PASSWORD:vhwv qtkl hfda pfzy}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  main:
+    allow-circular-references: true
+
+whatsapp:
+  api:
+    url: https://graph.facebook.com/v18.0
+  phone:
+    number:
+      id: ${WHATSAPP_PHONE_NUMBER_ID:YOUR_PHONE_NUMBER_ID}
+  access:
+    token: ${WHATSAPP_ACCESS_TOKEN:YOUR_ACCESS_TOKEN}
 
 eureka:
   client:

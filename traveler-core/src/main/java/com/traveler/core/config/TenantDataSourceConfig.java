@@ -38,6 +38,9 @@ public class TenantDataSourceConfig {
     public DataSource dataSource() {
         TenantRoutingDataSource routingDataSource = new TenantRoutingDataSource(datasourceUrl, username, password, driverClassName);
         
+        // Create default database if not exists
+        createDefaultDatabase();
+        
         DataSource defaultDataSource = DataSourceBuilder.create()
                 .url(datasourceUrl)
                 .username(username)
@@ -53,6 +56,25 @@ public class TenantDataSourceConfig {
         routingDataSource.afterPropertiesSet();
         
         return routingDataSource;
+    }
+    
+    private void createDefaultDatabase() {
+        try {
+            String dbName = extractDatabaseName(datasourceUrl);
+            String rootUrl = datasourceUrl.substring(0, datasourceUrl.lastIndexOf("/"));
+            
+            try (Connection conn = java.sql.DriverManager.getConnection(rootUrl, username, password);
+                 Statement stmt = conn.createStatement()) {
+                stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS " + dbName);
+                System.out.println("[DEFAULT-DB] Database created/verified: " + dbName);
+            }
+        } catch (Exception e) {
+            System.err.println("[DEFAULT-DB] Failed to create database: " + e.getMessage());
+        }
+    }
+    
+    private String extractDatabaseName(String url) {
+        return url.substring(url.lastIndexOf("/") + 1).split("\\?")[0];
     }
 
     public static class TenantRoutingDataSource extends AbstractRoutingDataSource {
@@ -87,7 +109,9 @@ public class TenantDataSourceConfig {
                         createTenantDatabaseAndDataSource(tenantId);
                     }
                 }
-            } else {
+            } else if (tenantId != null) {
+                // Force schema update for existing tenant databases
+                updateTenantSchema(tenantId);
                 System.out.println("[DATASOURCE] Using existing datasource for tenant: " + tenantId);
             }
             DataSource ds = super.determineTargetDataSource();
@@ -115,27 +139,7 @@ public class TenantDataSourceConfig {
                 
                 // Create tables using JPA
                 String dbUrl = rootUrl + "/" + dbName;
-                DataSource tempDataSource = DataSourceBuilder.create()
-                        .url(dbUrl)
-                        .username(username)
-                        .password(password)
-                        .driverClassName(driverClassName)
-                        .build();
-                
-                LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
-                emf.setDataSource(tempDataSource);
-                emf.setPackagesToScan("com.traveler.common.entity");
-                emf.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
-                
-                Map<String, Object> props = new HashMap<>();
-                props.put("hibernate.hbm2ddl.auto", "update");
-                props.put("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
-                props.put("hibernate.physical_naming_strategy", "org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy");
-                emf.setJpaPropertyMap(props);
-                
-                emf.afterPropertiesSet();
-                EntityManagerFactory factory = emf.getObject();
-                factory.close();
+                createTablesForTenant(dbUrl);
                 
                 // Create datasource
                 DataSource tenantDataSource = DataSourceBuilder.create()
@@ -162,6 +166,43 @@ public class TenantDataSourceConfig {
             } catch (Exception e) {
                 throw new RuntimeException("Failed to create tenant database: " + tenantId, e);
             }
+        }
+        
+        private void updateTenantSchema(String tenantId) {
+            try {
+                String dbName = tenantId.toLowerCase().replace("-", "_");
+                String rootUrl = baseUrl.substring(0, baseUrl.lastIndexOf("/"));
+                String dbUrl = rootUrl + "/" + dbName;
+                
+                createTablesForTenant(dbUrl);
+                System.out.println("[SCHEMA_UPDATE] Updated schema for tenant: " + tenantId);
+            } catch (Exception e) {
+                System.err.println("[SCHEMA_UPDATE] Failed to update schema for tenant: " + tenantId + ", Error: " + e.getMessage());
+            }
+        }
+        
+        private void createTablesForTenant(String dbUrl) throws Exception {
+            DataSource tempDataSource = DataSourceBuilder.create()
+                    .url(dbUrl)
+                    .username(username)
+                    .password(password)
+                    .driverClassName(driverClassName)
+                    .build();
+            
+            LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
+            emf.setDataSource(tempDataSource);
+            emf.setPackagesToScan("com.traveler.common.entity");
+            emf.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+            
+            Map<String, Object> props = new HashMap<>();
+            props.put("hibernate.hbm2ddl.auto", "update");
+            props.put("hibernate.dialect", "org.hibernate.dialect.MySQL8Dialect");
+            props.put("hibernate.physical_naming_strategy", "org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy");
+            emf.setJpaPropertyMap(props);
+            
+            emf.afterPropertiesSet();
+            EntityManagerFactory factory = emf.getObject();
+            factory.close();
         }
     }
 }

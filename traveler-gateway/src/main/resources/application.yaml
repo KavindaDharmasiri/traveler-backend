@@ -13,7 +13,6 @@ spring:
           predicates:
             - Path=/auth/**
           filters:
-            - StripPrefix=1
             - PreserveHostHeader
         - id: core-service
           uri: lb://traveler-core
