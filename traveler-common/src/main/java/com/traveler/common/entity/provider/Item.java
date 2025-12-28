@@ -43,6 +43,8 @@ public class Item {
     
     @Column(name = "overall_rating")
     private Double overallRating = 0.0;
+
+    private int qty;
     
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicle_details_id")
@@ -157,5 +159,29 @@ public class Item {
 
     public void setReviews(List<ItemReview> reviews) {
         this.reviews = reviews;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public int getQty() {
+        return qty;
+    }
+
+    public void setQty(int qty) {
+        this.qty = qty;
     }
 }

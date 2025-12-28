@@ -47,11 +47,11 @@ public class CartService {
                 dto.setOrder(orderDTO);
 
                 try {
-                    ItemDTO itemDTO = authClient.getItemForTraveler(
-                        Long.valueOf(cart.getOrder().getItem()),
-                        cart.getOrder().getProviderTenant()
-                    ).getBody();
-                    dto.setItemDetails(itemDTO);
+                    // ItemDTO itemDTO = authClient.getItemForTraveler(
+                    //     Long.valueOf(cart.getOrder().getItem()),
+                    //     cart.getOrder().getProviderTenant()
+                    // ).getBody();
+                    // dto.setItemDetails(itemDTO);
                 } catch (Exception e) {
                     System.err.println("Failed to fetch item details: " + e.getMessage());
                 }

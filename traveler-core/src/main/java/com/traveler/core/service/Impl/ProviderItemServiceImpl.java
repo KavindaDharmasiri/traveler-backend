@@ -48,6 +48,7 @@ public class ProviderItemServiceImpl implements ProviderItemService {
             item.setContact(itemDTO.getContact() != null ? itemDTO.getContact() : "N/A");
             item.setDescription(itemDTO.getDescription() != null ? itemDTO.getDescription() : "No description");
             item.setPricePerDay(itemDTO.getPricePerDay() > 0 ? itemDTO.getPricePerDay() : 1.0);
+            item.setQty(itemDTO.getQty() > 0 ? itemDTO.getQty() : 1);
             String imgList = itemDTO.getImages() != null ? String.join(",", itemDTO.getImages()) : "";
             item.setImages(imgList);
             item.setStatus(STATUS.UNDER_REVIEW);
@@ -196,6 +197,7 @@ public class ProviderItemServiceImpl implements ProviderItemService {
         dto.setStatus(item.getStatus());
         dto.setCurrency(item.getCurrency());
         dto.setOverallRating(item.getOverallRating());
+        dto.setQty(item.getQty());
         dto.setImages(List.of(item.getImages().split(",")));
         
         // Convert vehicle details if present
@@ -249,6 +251,7 @@ public class ProviderItemServiceImpl implements ProviderItemService {
         dto.setOverallRating(item.getOverallRating());
         dto.setStatus(item.getStatus());
         dto.setCurrency(item.getCurrency());
+        dto.setQty(item.getQty());
         dto.setImages(List.of(item.getImages().split(",")));
         
         if (item.getVehicleDetails() != null) {

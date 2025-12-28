@@ -38,6 +38,7 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/register", "/auth/login", "/auth/refresh", "/auth/validate").permitAll()
+                .requestMatchers("/auth/users", "/auth/users/**", "/auth/user").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers("/api/v1/phone-verification/**").permitAll()
                 .requestMatchers("/api/v1/email-verification/**").permitAll()

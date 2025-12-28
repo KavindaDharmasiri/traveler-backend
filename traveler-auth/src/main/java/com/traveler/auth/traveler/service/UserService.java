@@ -239,6 +239,41 @@ public class UserService implements UserDetailsService {
         return providers.stream().map(User::getName).distinct().sorted().toList();
     }
     
+    public List<UserResponse> getAllUsers() {
+        List<User> users = userRepository.findAllByIsActive(true);
+        return users.stream().map(this::mapToUserResponse).toList();
+    }
+    
+    public List<UserResponse> getAllUsersByType(UserType type) {
+        List<User> users = userRepository.findAllByType(type);
+        return users.stream().map(this::mapToUserResponse).toList();
+    }
+    
+    public List<UserResponse> getPendingUsers() {
+        List<User> users = userRepository.findAllByIsActive(false);
+        return users.stream().map(this::mapToUserResponse).toList();
+    }
+    
+    private UserResponse mapToUserResponse(User user) {
+        UserResponse response = new UserResponse();
+        response.setId(user.getId());
+        response.setType(user.getType());
+        response.setName(user.getName());
+        response.setGender(user.getGender());
+        response.setContactNumber(user.getContactNumber());
+        response.setIsNumberVerified(user.getIsNumberVerified());
+        response.setEmail(user.getEmail());
+        response.setIsEmailVerified(user.getIsEmailVerified());
+        response.setDateOfBirth(user.getDateOfBirth());
+        response.setNicNumber(user.getNicNumber());
+        response.setNicImageUuid(user.getNicImageUuid());
+        response.setTenantId(user.getTenantId());
+        response.setProfileImageUuid(user.getProfileImageUuid());
+        response.setCountry(user.getCountry());
+        response.setGoogleMapsUrl(user.getGoogleMapsUrl());
+        return response;
+    }
+    
     private String normalizePhoneNumber(String phoneNumber) {
         if (phoneNumber == null) return "";
         // Remove all non-digit characters

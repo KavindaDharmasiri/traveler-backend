@@ -9,6 +9,7 @@ public class BackpackDTO {
     private Long itemId;
     private String providerTenant;
     private Integer rentalDays;
+    private Integer quantity;
     private LocalDate pickupDate;
     private LocalDate returnDate;
     private BigDecimal totalPrice;

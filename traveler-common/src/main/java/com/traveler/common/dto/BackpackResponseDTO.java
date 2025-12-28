@@ -12,6 +12,7 @@ public class BackpackResponseDTO {
     private Long itemId;
     private String providerTenant;
     private Integer rentalDays;
+    private Integer qty;
     private LocalDate pickupDate;
     private LocalDate returnDate;
     private BigDecimal totalPrice;

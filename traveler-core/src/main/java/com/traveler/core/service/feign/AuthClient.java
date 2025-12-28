@@ -50,6 +50,12 @@ public interface AuthClient {
     @GetMapping("/auth/user")
     UserResponse getUserByTenant(@RequestParam("tenant") String tenant);
 
+    @GetMapping("/auth/users")
+    ResponseEntity<List<UserResponse>> getAllUsers();
+
+    @GetMapping("/auth/users/type/{type}")
+    ResponseEntity<List<UserResponse>> getUsersByType(@PathVariable("type") String type);
+
     @PostMapping("/order/changeStatus")
     String updateOrderStatus(@RequestBody Map map);
 

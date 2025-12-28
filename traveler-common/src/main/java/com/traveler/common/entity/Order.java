@@ -29,6 +29,7 @@ public class Order {
     @Column(name = "customer_name", nullable = false)
     private String customerName;
     private int item;
+    private int qty;
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
@@ -153,5 +154,13 @@ public class Order {
 
     public void setReturnDate(LocalDate returnDate) {
         this.returnDate = returnDate;
+    }
+
+    public int getQty() {
+        return qty;
+    }
+
+    public void setQty(int qty) {
+        this.qty = qty;
     }
 }

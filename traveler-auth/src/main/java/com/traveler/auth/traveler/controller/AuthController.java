@@ -5,6 +5,7 @@ import com.traveler.auth.traveler.service.AuthService;
 import com.traveler.auth.traveler.service.UserService;
 import com.traveler.auth.traveler.dto.ProfileUpdateDTO;
 
+import com.traveler.auth.traveler.utils.UserType;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -118,6 +119,29 @@ public class AuthController {
     public ResponseEntity<List<String>> getProviders() {
         List<String> providers = userService.getProviders();
         return ResponseEntity.ok(providers);
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<List<UserResponse>> getAllUsers() {
+        List<UserResponse> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/users/type/{type}")
+    public ResponseEntity<List<UserResponse>> getUsersByType(@PathVariable String type) {
+        try {
+            UserType userType = UserType.valueOf(type.toUpperCase());
+            List<UserResponse> users = userService.getAllUsersByType(userType);
+            return ResponseEntity.ok(users);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/users/pending")
+    public ResponseEntity<List<UserResponse>> getPendingUsers() {
+        List<UserResponse> users = userService.getPendingUsers();
+        return ResponseEntity.ok(users);
     }
 
 }

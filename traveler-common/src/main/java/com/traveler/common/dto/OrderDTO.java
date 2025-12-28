@@ -23,6 +23,7 @@ public class OrderDTO {
     private STATUS status;
     private double totalPrice;
     private int rentalDays;
+    private int qty;
     private String clientTenant;
     private String providerTenant;
     private String groupTenant;
@@ -158,5 +159,13 @@ public class OrderDTO {
 
     public void setMap(String map) {
         this.map = map;
+    }
+
+    public int getQty() {
+        return qty;
+    }
+
+    public void setQty(int qty) {
+        this.qty = qty;
     }
 }

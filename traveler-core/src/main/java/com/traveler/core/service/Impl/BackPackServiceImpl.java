@@ -57,6 +57,7 @@ public class BackPackServiceImpl implements BackPackService {
             backpack.setPickupDate(backpackDTO.getPickupDate());
             backpack.setReturnDate(backpackDTO.getReturnDate());
             backpack.setTotalPrice(backpackDTO.getTotalPrice());
+            backpack.setQty(backpackDTO.getQuantity());
             backpack.setCode(UUID.randomUUID().toString());
 
             backpackRepository.save(backpack);
@@ -105,6 +106,7 @@ public class BackPackServiceImpl implements BackPackService {
         dto.setItemId(backpack.getItemId());
         dto.setProviderTenant(authClient.getUserByTenant(backpack.getProviderTenant()).getName());
         dto.setRentalDays(backpack.getRentalDays());
+        dto.setQty(backpack.getQty());
         dto.setPickupDate(backpack.getPickupDate());
         dto.setReturnDate(backpack.getReturnDate());
         dto.setTotalPrice(backpack.getTotalPrice());

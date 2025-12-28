@@ -19,6 +19,7 @@ public class ItemDetailsDTO {
     private String contact;
     private String description;
     private String currency;
+    private int qty;
     private String tenant;
     private String providerName;
     private STATUS status;

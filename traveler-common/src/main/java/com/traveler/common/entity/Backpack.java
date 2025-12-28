@@ -30,7 +30,8 @@ public class Backpack {
 
     @Column(nullable = false)
     private Integer rentalDays;
-    
+    private Integer qty;
+
     @Column(nullable = false)
     private LocalDate pickupDate;
     

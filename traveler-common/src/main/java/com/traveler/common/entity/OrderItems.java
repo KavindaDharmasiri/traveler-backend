@@ -18,6 +18,7 @@ public class OrderItems {
     private com.traveler.common.entity.Order order;
 
     private int item;
+    private int qty;
     @Column(name = "total_price")
     private double totalPrice;
     @Column(name = "rental_days")
@@ -125,5 +126,13 @@ public class OrderItems {
 
     public void setBagCode(String bagCode) {
         this.bagCode = bagCode;
+    }
+
+    public int getQty() {
+        return qty;
+    }
+
+    public void setQty(int qty) {
+        this.qty = qty;
     }
 }

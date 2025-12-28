@@ -77,6 +77,7 @@ public class OrderServiceImpl implements OrderService {
                 orderItem.setPickupDate(backpack.getPickupDate());
                 orderItem.setReturnDate(backpack.getReturnDate());
                 orderItem.setBagCode(backpack.getCode());
+                orderItem.setQty(backpack.getQty());
                 orderItem.setStatus(STATUS.PENDING);
                 orderItemsRepository.save(orderItem);
 //            }
@@ -351,6 +352,7 @@ public class OrderServiceImpl implements OrderService {
                     itemDTO.setOrderCode(order.getOrderCode());
                     itemDTO.setCustomerName(order.getCustomerName());
                     itemDTO.setClientTenant(order.getClientTenant());
+                    itemDTO.setQty(orderItem.getQty());
                     UserResponse userByTenant = authClient.getUserByTenant(orderItem.getProviderTenant());
                     itemDTO.setProviderName(userByTenant.getName());
                     itemDTO.setMap(userByTenant.getGoogleMapsUrl());

@@ -20,6 +20,7 @@ public class ItemDTO {
     private String name;
     private Long id;
     private String contact;
+    private int qty;
     private String description;
     private String currency;
     private STATUS status;
