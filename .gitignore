@@ -25,3 +25,6 @@ Thumbs.db
 
 # Spring Boot
 *.pid
+
+# Uploads
+uploads/
