@@ -1,5 +1,7 @@
 package com.traveler.core.config;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
@@ -8,13 +10,10 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
-import com.traveler.common.entity.Trip;
-import com.traveler.common.entity.Booking;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Statement;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,15 +37,9 @@ public class TenantDataSourceConfig {
     public DataSource dataSource() {
         TenantRoutingDataSource routingDataSource = new TenantRoutingDataSource(datasourceUrl, username, password, driverClassName);
         
-        // Create default database if not exists
         createDefaultDatabase();
         
-        DataSource defaultDataSource = DataSourceBuilder.create()
-                .url(datasourceUrl)
-                .username(username)
-                .password(password)
-                .driverClassName(driverClassName)
-                .build();
+        DataSource defaultDataSource = createOptimizedDataSource(datasourceUrl);
         
         Map<Object, Object> dataSources = new HashMap<>();
         dataSources.put("default", defaultDataSource);
@@ -56,6 +49,24 @@ public class TenantDataSourceConfig {
         routingDataSource.afterPropertiesSet();
         
         return routingDataSource;
+    }
+    
+    private DataSource createOptimizedDataSource(String url) {
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(url);
+        config.setUsername(username);
+        config.setPassword(password);
+        config.setDriverClassName(driverClassName);
+        
+        // Minimal pool settings per tenant
+        config.setMaximumPoolSize(2);
+        config.setMinimumIdle(1);
+        config.setConnectionTimeout(10000);
+        config.setIdleTimeout(300000);
+        config.setMaxLifetime(600000);
+        config.setLeakDetectionThreshold(30000);
+        
+        return new HikariDataSource(config);
     }
     
     private void createDefaultDatabase() {
@@ -79,6 +90,7 @@ public class TenantDataSourceConfig {
 
     public static class TenantRoutingDataSource extends AbstractRoutingDataSource {
         private final ConcurrentHashMap<String, Boolean> createdTenants = new ConcurrentHashMap<>();
+        private final ConcurrentHashMap<String, DataSource> tenantDataSources = new ConcurrentHashMap<>();
         private final String baseUrl;
         private final String username;
         private final String password;
@@ -102,6 +114,7 @@ public class TenantDataSourceConfig {
             String tenantId = TenantContext.getCurrentTenant();
             System.out.println("[DATASOURCE] Determining datasource for tenant: " + tenantId);
             System.out.println("[DATASOURCE] Available datasources: " + getResolvedDataSources().keySet());
+            
             if (tenantId != null && !getResolvedDataSources().containsKey(tenantId)) {
                 System.out.println("[DATASOURCE] Tenant " + tenantId + " not found, creating...");
                 synchronized (this) {
@@ -110,10 +123,9 @@ public class TenantDataSourceConfig {
                     }
                 }
             } else if (tenantId != null) {
-                // Force schema update for existing tenant databases
-                updateTenantSchema(tenantId);
                 System.out.println("[DATASOURCE] Using existing datasource for tenant: " + tenantId);
             }
+            
             DataSource ds = super.determineTargetDataSource();
             System.out.println("[DATASOURCE] Selected datasource: " + ds.getClass().getSimpleName());
             return ds;
@@ -129,7 +141,6 @@ public class TenantDataSourceConfig {
                 String dbName = tenantId.toLowerCase().replace("-", "_");
                 System.out.println("[DB_CREATE] Creating tenant database: " + dbName + " for tenant: " + tenantId);
                 
-                // Create database
                 String rootUrl = baseUrl.substring(0, baseUrl.lastIndexOf("/"));
                 try (Connection conn = java.sql.DriverManager.getConnection(rootUrl, username, password);
                      Statement stmt = conn.createStatement()) {
@@ -137,95 +148,72 @@ public class TenantDataSourceConfig {
                     System.out.println("Database created successfully: " + dbName);
                 }
                 
-                // Create tables using JPA
                 String dbUrl = rootUrl + "/" + dbName;
                 createTablesForTenant(dbUrl);
                 
-                // Create datasource
-                DataSource tenantDataSource = DataSourceBuilder.create()
-                        .url(dbUrl)
-                        .username(username)
-                        .password(password)
-                        .driverClassName(driverClassName)
-                        .build();
+                // Reuse or create minimal datasource
+                DataSource tenantDataSource = tenantDataSources.computeIfAbsent(tenantId, k -> createOptimizedDataSource(dbUrl));
                 
-                // Register the new datasource
                 Map<Object, Object> dataSources = new HashMap<>(getResolvedDataSources());
                 dataSources.put(tenantId, tenantDataSource);
                 setTargetDataSources(dataSources);
                 afterPropertiesSet();
                 
-                // Verify datasource is registered
-                if (!getResolvedDataSources().containsKey(tenantId)) {
-                    throw new RuntimeException("Failed to register tenant datasource: " + tenantId);
-                }
-                
                 createdTenants.put(tenantId, true);
                 System.out.println("Successfully created tenant database and datasource: " + tenantId);
                 
             } catch (Exception e) {
-                throw new RuntimeException("Failed to create tenant database: " + tenantId, e);
+                System.err.println("Failed to create tenant database: " + tenantId + ", Error: " + e.getMessage());
             }
         }
         
-        private void updateTenantSchema(String tenantId) {
+        private DataSource createOptimizedDataSource(String url) {
+            HikariConfig config = new HikariConfig();
+            config.setJdbcUrl(url);
+            config.setUsername(username);
+            config.setPassword(password);
+            config.setDriverClassName(driverClassName);
+            
+            // Minimal pool per tenant
+            config.setMaximumPoolSize(2);
+            config.setMinimumIdle(1);
+            config.setConnectionTimeout(10000);
+            config.setIdleTimeout(300000);
+            config.setMaxLifetime(600000);
+            
+            return new HikariDataSource(config);
+        }
+        
+        private void createTablesForTenant(String dbUrl) {
             try {
-                String dbName = tenantId.toLowerCase().replace("-", "_");
-                String rootUrl = baseUrl.substring(0, baseUrl.lastIndexOf("/"));
-                String dbUrl = rootUrl + "/" + dbName;
+                DataSource tempDataSource = createOptimizedDataSource(dbUrl);
                 
-                createTablesForTenant(dbUrl);
-                System.out.println("[SCHEMA_UPDATE] Updated schema for tenant: " + tenantId);
+                LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
+                emf.setDataSource(tempDataSource);
+                emf.setPackagesToScan("com.traveler.common.entity");
+                emf.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+
+                Map<String, Object> props = new HashMap<>();
+                props.put("hibernate.hbm2ddl.auto", "update");
+                props.put("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
+                props.put("hibernate.temp.use_jdbc_metadata_defaults", false);
+
+                emf.setJpaPropertyMap(props);
+                emf.afterPropertiesSet();
+
+                EntityManagerFactory factory = emf.getObject();
+                if (factory != null) {
+                    factory.close();
+                }
+                
+                // Close temp datasource
+                if (tempDataSource instanceof HikariDataSource) {
+                    ((HikariDataSource) tempDataSource).close();
+                }
+                
             } catch (Exception e) {
-                System.err.println("[SCHEMA_UPDATE] Failed to update schema for tenant: " + tenantId + ", Error: " + e.getMessage());
+                System.err.println("[SCHEMA_UPDATE] Failed to update schema, Error: " + e.getMessage());
             }
-        }
-        
-//        private void createTablesForTenant(String dbUrl) throws Exception {
-//            DataSource tempDataSource = DataSourceBuilder.create()
-//                    .url(dbUrl)
-//                    .username(username)
-//                    .password(password)
-//                    .driverClassName(driverClassName)
-//                    .build();
-//
-//            LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
-//            emf.setDataSource(tempDataSource);
-//            emf.setPackagesToScan("com.traveler.common.entity");
-//            emf.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
-//
-//            Map<String, Object> props = new HashMap<>();
-//            props.put("hibernate.hbm2ddl.auto", "update");
-//            props.put("hibernate.dialect", "org.hibernate.dialect.MySQL8Dialect");
-//            props.put("hibernate.physical_naming_strategy", "org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy");
-//            emf.setJpaPropertyMap(props);
-//
-//            emf.afterPropertiesSet();
-//            EntityManagerFactory factory = emf.getObject();
-//            factory.close();
-//        }
-
-        private synchronized void createTablesForTenant(String dbUrl) {
-            LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
-            emf.setDataSource(DataSourceBuilder.create()
-                    .url(dbUrl)
-                    .username(username)
-                    .password(password)
-                    .driverClassName(driverClassName)
-                    .build());
-
-            emf.setPackagesToScan("com.traveler.common.entity");
-            emf.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
-
-            Map<String, Object> props = new HashMap<>();
-            props.put("hibernate.hbm2ddl.auto", "update");
-            props.put("hibernate.dialect", "org.hibernate.dialect.MySQL8Dialect");
-            props.put("hibernate.temp.use_jdbc_metadata_defaults", false);
-
-            emf.setJpaPropertyMap(props);
-            emf.afterPropertiesSet();
-
-            emf.getObject().close();
         }
     }
 }

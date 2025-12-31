@@ -32,6 +32,7 @@ public class OrderDTO {
     private String returnDate;
     private String providerName;
     private String map;
+    private String contact;
 
     public Long getId() {
         return id;
@@ -167,5 +168,13 @@ public class OrderDTO {
 
     public void setQty(int qty) {
         this.qty = qty;
+    }
+
+    public String getContact() {
+        return contact;
+    }
+
+    public void setContact(String contact) {
+        this.contact = contact;
     }
 }

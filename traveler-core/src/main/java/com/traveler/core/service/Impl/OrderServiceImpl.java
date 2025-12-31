@@ -774,7 +774,11 @@ public class OrderServiceImpl implements OrderService {
                     itemDTO.setCustomerName(pastOrder.getCustomerName());
                     itemDTO.setClientTenant(pastOrder.getClientTenant());
                     itemDTO.setQty(pastOrderItem.getQty());
-                    
+                    UserResponse userByTenant = authClient.getUserByTenant(pastOrderItem.getProviderTenant());
+                    itemDTO.setProviderName(userByTenant.getName());
+                    itemDTO.setMap(userByTenant.getGoogleMapsUrl());
+                    itemDTO.setContact(userByTenant.getContactNumber());
+
                     try {
                         ResponseEntity<ItemDTO> itemResponse = authClient.getItemForTraveler((long) pastOrderItem.getItem(), pastOrderItem.getProviderTenant());
                         itemDTO.setItemObj(itemResponse.getBody());
