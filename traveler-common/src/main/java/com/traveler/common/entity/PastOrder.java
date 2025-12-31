@@ -1,6 +1,5 @@
 package com.traveler.common.entity;
 
-import com.traveler.common.entity.provider.Item;
 import com.traveler.common.utils.STATUS;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -17,8 +16,8 @@ import java.util.Date;
  */
 
 @Entity
-@Table(name = "`order`")
-public class Order {
+@Table(name = "`past_order`")
+public class PastOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

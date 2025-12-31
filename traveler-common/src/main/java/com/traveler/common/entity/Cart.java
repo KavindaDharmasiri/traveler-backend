@@ -15,9 +15,8 @@ public class Cart {
     @Column(name = "user_tenant", nullable = false)
     private String userTenant;
 
-    @OneToOne
-    @JoinColumn(name = "order_id", referencedColumnName = "id")
-    private Order order;
+    @Column(name = "order_code", nullable = false)
+    private String orderCode;
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
@@ -40,12 +39,12 @@ public class Cart {
         this.userTenant = userTenant;
     }
 
-    public Order getOrder() {
-        return order;
+    public String getOrderCode() {
+        return orderCode;
     }
 
-    public void setOrder(Order order) {
-        this.order = order;
+    public void setOrderCode(String orderCode) {
+        this.orderCode = orderCode;
     }
 
     public Date getCreatedAt() {

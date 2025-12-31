@@ -1,55 +1,45 @@
 package com.traveler.common.entity;
 
-import com.traveler.common.entity.provider.Item;
 import com.traveler.common.utils.STATUS;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.util.Date;
 
-/**
- * ALL RIGHT RESERVED By kavinda_d
- *
- * @AUTHOR : kavinda_d
- * @PROJECT : traveler backend
- */
-
 @Entity
-@Table(name = "`order`")
-public class Order {
+@Table(name = "past_order_items")
+public class PastOrderItems {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "order_code", nullable = false, unique = true)
-    private String orderCode;
-    @Column(name = "customer_name", nullable = false)
-    private String customerName;
+    @ManyToOne
+    @JoinColumn(name = "order_id")
+    private PastOrder order;
+
     private int item;
     private int qty;
-    @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    @CreationTimestamp
-    private Date createdAt;
-    @Column(name = "updated_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    @UpdateTimestamp
-    private Date updatedAt;
-    private STATUS status;
-    @Column(name = "rental")
+    @Column(name = "total_price")
     private double totalPrice;
     @Column(name = "rental_days")
     private int rentalDays;
-    @Column(name = "client_tenant")
-    private String clientTenant;
     @Column(name = "provider_tenant")
     private String providerTenant;
+    @Column(name = "bag_code")
+    private String bagCode;
     @Column(name = "pickup_date")
     private LocalDate pickupDate;
     @Column(name = "return_date")
     private LocalDate returnDate;
+    
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp
+    private Date createdAt;
+
+    @Enumerated(EnumType.STRING)
+    private STATUS status = STATUS.PENDING;
 
     public Long getId() {
         return id;
@@ -59,20 +49,12 @@ public class Order {
         this.id = id;
     }
 
-    public String getOrderCode() {
-        return orderCode;
+    public PastOrder getOrder() {
+        return order;
     }
 
-    public void setOrderCode(String orderCode) {
-        this.orderCode = orderCode;
-    }
-
-    public String getCustomerName() {
-        return customerName;
-    }
-
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
+    public void setOrder(PastOrder order) {
+        this.order = order;
     }
 
     public int getItem() {
@@ -81,30 +63,6 @@ public class Order {
 
     public void setItem(int item) {
         this.item = item;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public STATUS getStatus() {
-        return status;
-    }
-
-    public void setStatus(STATUS status) {
-        this.status = status;
     }
 
     public double getTotalPrice() {
@@ -121,14 +79,6 @@ public class Order {
 
     public void setRentalDays(int rentalDays) {
         this.rentalDays = rentalDays;
-    }
-
-    public String getClientTenant() {
-        return clientTenant;
-    }
-
-    public void setClientTenant(String clientTenant) {
-        this.clientTenant = clientTenant;
     }
 
     public String getProviderTenant() {
@@ -153,6 +103,30 @@ public class Order {
 
     public void setReturnDate(LocalDate returnDate) {
         this.returnDate = returnDate;
+    }
+
+    public STATUS getStatus() {
+        return status;
+    }
+
+    public void setStatus(STATUS status) {
+        this.status = status;
+    }
+    
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getBagCode() {
+        return bagCode;
+    }
+
+    public void setBagCode(String bagCode) {
+        this.bagCode = bagCode;
     }
 
     public int getQty() {

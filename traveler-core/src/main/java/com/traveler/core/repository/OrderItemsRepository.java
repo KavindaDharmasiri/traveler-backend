@@ -1,8 +1,12 @@
 package com.traveler.core.repository;
 
+import com.traveler.common.entity.Order;
 import com.traveler.common.entity.OrderItems;
 import com.traveler.common.utils.STATUS;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
@@ -14,4 +18,13 @@ public interface OrderItemsRepository extends JpaRepository<OrderItems, Long> {
     List<OrderItems> findByStatus(STATUS status);
 
     Optional<OrderItems> findByBagCode(String bagCode);
+
+    void deleteByOrderId(Long order_id);
+
+    void deleteByBagCode(String bagCode);
+
+
+    List<OrderItems> findAllByOrder(Order order);
+
+    void deleteAllByStatus(STATUS status);
 }

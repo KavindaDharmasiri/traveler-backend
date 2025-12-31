@@ -34,28 +34,28 @@ public class CartService {
             dto.setId(cart.getId());
             dto.setUserTenant(cart.getUserTenant());
             
-            if (cart.getOrder() != null) {
-                OrderDTO orderDTO = new OrderDTO();
-                orderDTO.setId(cart.getOrder().getId());
-                orderDTO.setOrderCode(cart.getOrder().getOrderCode());
-                orderDTO.setCustomerName(cart.getOrder().getCustomerName());
-                orderDTO.setItem(cart.getOrder().getItem());
-                orderDTO.setStatus(cart.getOrder().getStatus());
-                orderDTO.setTotalPrice(cart.getOrder().getTotalPrice());
-                orderDTO.setRentalDays(cart.getOrder().getRentalDays());
-                orderDTO.setProviderTenant(cart.getOrder().getProviderTenant());
-                dto.setOrder(orderDTO);
-
-                try {
-                    // ItemDTO itemDTO = authClient.getItemForTraveler(
-                    //     Long.valueOf(cart.getOrder().getItem()),
-                    //     cart.getOrder().getProviderTenant()
-                    // ).getBody();
-                    // dto.setItemDetails(itemDTO);
-                } catch (Exception e) {
-                    System.err.println("Failed to fetch item details: " + e.getMessage());
-                }
-            }
+//            if (cart.getOrder() != null) {
+//                OrderDTO orderDTO = new OrderDTO();
+//                orderDTO.setId(cart.getOrder().getId());
+//                orderDTO.setOrderCode(cart.getOrder().getOrderCode());
+//                orderDTO.setCustomerName(cart.getOrder().getCustomerName());
+//                orderDTO.setItem(cart.getOrder().getItem());
+//                orderDTO.setStatus(cart.getOrder().getStatus());
+//                orderDTO.setTotalPrice(cart.getOrder().getTotalPrice());
+//                orderDTO.setRentalDays(cart.getOrder().getRentalDays());
+//                orderDTO.setProviderTenant(cart.getOrder().getProviderTenant());
+//                dto.setOrder(orderDTO);
+//
+//                try {
+//                    // ItemDTO itemDTO = authClient.getItemForTraveler(
+//                    //     Long.valueOf(cart.getOrder().getItem()),
+//                    //     cart.getOrder().getProviderTenant()
+//                    // ).getBody();
+//                    // dto.setItemDetails(itemDTO);
+//                } catch (Exception e) {
+//                    System.err.println("Failed to fetch item details: " + e.getMessage());
+//                }
+//            }
             
             return dto;
         }).collect(Collectors.toList());

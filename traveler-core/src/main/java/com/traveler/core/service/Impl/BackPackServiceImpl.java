@@ -9,6 +9,8 @@ import com.traveler.core.service.BackPackService;
 import com.traveler.core.service.feign.AuthClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -59,6 +61,7 @@ public class BackPackServiceImpl implements BackPackService {
             backpack.setTotalPrice(backpackDTO.getTotalPrice());
             backpack.setQty(backpackDTO.getQuantity());
             backpack.setCode(UUID.randomUUID().toString());
+            backpack.setCreatedAt(LocalDateTime.now());
 
             backpackRepository.save(backpack);
             

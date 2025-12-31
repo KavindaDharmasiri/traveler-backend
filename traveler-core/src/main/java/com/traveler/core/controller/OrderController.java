@@ -1,9 +1,6 @@
 package com.traveler.core.controller;
 
-import com.traveler.common.dto.BulkOrderStatusUpdateDTO;
-import com.traveler.common.dto.OrderDTO;
-import com.traveler.common.dto.OrderWithItemsDTO;
-import com.traveler.common.dto.SeparateSaveOrderDTO;
+import com.traveler.common.dto.*;
 import com.traveler.common.dto.provider.ItemDTO;
 import com.traveler.common.entity.Backpack;
 import com.traveler.common.entity.Order;
@@ -75,10 +72,10 @@ public class OrderController {
     }
 
     @PostMapping("/auth-update-status")
-    public ResponseEntity<String> authUpdatStatus(@RequestBody Map<String, String> map) {
-        String orderId = map.get("orderId");
-        String itemId = map.get("itemId");
-        String status = map.get("status");
+    public ResponseEntity<String> authUpdatStatus(@RequestBody AuthUpdateStatusDTO map) {
+        String orderId = map.getOrderId();
+        String itemId = map.getItemId();
+        String status = map.getStatus();
         return orderService.authUpdatStatus(orderId, itemId, status);
     }
 

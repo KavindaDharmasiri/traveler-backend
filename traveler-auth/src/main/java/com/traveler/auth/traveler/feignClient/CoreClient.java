@@ -1,5 +1,6 @@
 package com.traveler.auth.traveler.feignClient;
 
+import com.traveler.common.dto.AuthUpdateStatusDTO;
 import com.traveler.common.dto.OrderDTO;
 import com.traveler.common.dto.SeparateSaveOrderDTO;
 import com.traveler.common.dto.provider.ItemDTO;
@@ -30,5 +31,5 @@ public interface CoreClient {
     String updateStatus(@PathVariable String orderCode, @PathVariable String status, @RequestHeader("X-Tenant-Id") String clientTenant);
 
     @PostMapping("/api/v1/order/auth-update-status")
-    ResponseEntity<String> updateOrderStatus(@RequestBody Map map, @RequestHeader("X-Tenant-Id") String tenant);
+    ResponseEntity<String> updateOrderStatus(@RequestBody AuthUpdateStatusDTO map, @RequestHeader("X-Tenant-Id") String tenant);
 }

@@ -15,7 +15,6 @@ public class ItemReview {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, columnDefinition = "BIGINT AUTO_INCREMENT")
     private Long id;
     @Column(name = "traveler_tenant")
     private String travelerTenant;

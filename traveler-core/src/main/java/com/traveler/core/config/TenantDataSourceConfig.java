@@ -181,28 +181,51 @@ public class TenantDataSourceConfig {
             }
         }
         
-        private void createTablesForTenant(String dbUrl) throws Exception {
-            DataSource tempDataSource = DataSourceBuilder.create()
+//        private void createTablesForTenant(String dbUrl) throws Exception {
+//            DataSource tempDataSource = DataSourceBuilder.create()
+//                    .url(dbUrl)
+//                    .username(username)
+//                    .password(password)
+//                    .driverClassName(driverClassName)
+//                    .build();
+//
+//            LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
+//            emf.setDataSource(tempDataSource);
+//            emf.setPackagesToScan("com.traveler.common.entity");
+//            emf.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+//
+//            Map<String, Object> props = new HashMap<>();
+//            props.put("hibernate.hbm2ddl.auto", "update");
+//            props.put("hibernate.dialect", "org.hibernate.dialect.MySQL8Dialect");
+//            props.put("hibernate.physical_naming_strategy", "org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy");
+//            emf.setJpaPropertyMap(props);
+//
+//            emf.afterPropertiesSet();
+//            EntityManagerFactory factory = emf.getObject();
+//            factory.close();
+//        }
+
+        private synchronized void createTablesForTenant(String dbUrl) {
+            LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
+            emf.setDataSource(DataSourceBuilder.create()
                     .url(dbUrl)
                     .username(username)
                     .password(password)
                     .driverClassName(driverClassName)
-                    .build();
-            
-            LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
-            emf.setDataSource(tempDataSource);
+                    .build());
+
             emf.setPackagesToScan("com.traveler.common.entity");
             emf.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
-            
+
             Map<String, Object> props = new HashMap<>();
             props.put("hibernate.hbm2ddl.auto", "update");
             props.put("hibernate.dialect", "org.hibernate.dialect.MySQL8Dialect");
-            props.put("hibernate.physical_naming_strategy", "org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy");
+            props.put("hibernate.temp.use_jdbc_metadata_defaults", false);
+
             emf.setJpaPropertyMap(props);
-            
             emf.afterPropertiesSet();
-            EntityManagerFactory factory = emf.getObject();
-            factory.close();
+
+            emf.getObject().close();
         }
     }
 }

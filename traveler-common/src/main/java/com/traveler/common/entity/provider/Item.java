@@ -21,7 +21,6 @@ import java.util.List;
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, columnDefinition = "BIGINT AUTO_INCREMENT")
     private Long id;
 
     private String category;

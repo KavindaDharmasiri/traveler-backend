@@ -4,6 +4,9 @@ import com.traveler.common.entity.Order;
 import com.traveler.common.entity.provider.Item;
 import com.traveler.common.utils.STATUS;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,4 +19,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findAllByStatusNot(STATUS status);
     
     List<Order> findAllByStatus(STATUS status);
+    
+    List<Order> findByClientTenant(String clientTenant);
+
+    void deleteByOrderCode(String orderId);
+
+    void deleteAllByStatus(STATUS status);
 }

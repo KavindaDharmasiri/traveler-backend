@@ -6,6 +6,7 @@ import com.traveler.auth.traveler.repository.OrderRepository;
 import com.traveler.auth.traveler.repository.OrderItemsRepository;
 import com.traveler.auth.traveler.repository.UserRepository;
 import com.traveler.auth.traveler.utils.UserType;
+import com.traveler.common.dto.AuthUpdateStatusDTO;
 import com.traveler.common.dto.OrderDTO;
 import com.traveler.common.dto.SeparateSaveOrderDTO;
 import com.traveler.common.dto.provider.ItemDTO;
@@ -250,10 +251,10 @@ public class OrderService {
 
     public ResponseEntity<String> changeStatus(String orderId, String itemId, String status, String tenant) {
         try{
-            Map map = new HashMap();
-            map.put("orderId", orderId);
-            map.put("itemId", itemId);
-            map.put("status", status);
+            AuthUpdateStatusDTO map = new AuthUpdateStatusDTO();
+            map.setOrderId(orderId);
+            map.setItemId(itemId);
+            map.setStatus(status);
             coreClient.updateOrderStatus(map, tenant);
 
             if (itemId != null) {
