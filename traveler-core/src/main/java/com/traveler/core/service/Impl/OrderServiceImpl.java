@@ -741,4 +741,59 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    @Override
+    public ResponseEntity<List<OrderWithItemsDTO>> findPastOrders() {
+        try {
+            String currentTenant = TenantContext.getCurrentTenant();
+            List<PastOrder> pastOrders = pastOrderRepository.findAllByOrderByCreatedAtDesc();
+            
+            List<OrderWithItemsDTO> result = new ArrayList<>();
+            
+            for (PastOrder pastOrder : pastOrders) {
+                OrderWithItemsDTO orderWithItems = new OrderWithItemsDTO();
+                orderWithItems.setId(pastOrder.getId());
+                orderWithItems.setOrderCode(pastOrder.getOrderCode());
+                orderWithItems.setCustomerName(pastOrder.getCustomerName());
+                orderWithItems.setStatus(pastOrder.getStatus().toString());
+                orderWithItems.setClientTenant(pastOrder.getClientTenant());
+                
+                List<PastOrderItems> pastOrderItems = pastOrderItemsRepository.findByOrderId(pastOrder.getId());
+                List<OrderDTO> items = new ArrayList<>();
+                
+                for (PastOrderItems pastOrderItem : pastOrderItems) {
+                    OrderDTO itemDTO = new OrderDTO();
+                    itemDTO.setId(pastOrderItem.getId());
+                    itemDTO.setItem(pastOrderItem.getItem());
+                    itemDTO.setTotalPrice(pastOrderItem.getTotalPrice());
+                    itemDTO.setRentalDays(pastOrderItem.getRentalDays());
+                    itemDTO.setProviderTenant(pastOrderItem.getProviderTenant());
+                    itemDTO.setPickupDate(pastOrderItem.getPickupDate().toString());
+                    itemDTO.setReturnDate(pastOrderItem.getReturnDate().toString());
+                    itemDTO.setStatus(pastOrderItem.getStatus());
+                    itemDTO.setOrderCode(pastOrder.getOrderCode());
+                    itemDTO.setCustomerName(pastOrder.getCustomerName());
+                    itemDTO.setClientTenant(pastOrder.getClientTenant());
+                    itemDTO.setQty(pastOrderItem.getQty());
+                    
+                    try {
+                        ResponseEntity<ItemDTO> itemResponse = authClient.getItemForTraveler((long) pastOrderItem.getItem(), pastOrderItem.getProviderTenant());
+                        itemDTO.setItemObj(itemResponse.getBody());
+                    } catch (Exception e) {
+                        System.err.println("Error fetching item details: " + e.getMessage());
+                    }
+                    
+                    items.add(itemDTO);
+                }
+                
+                orderWithItems.setItems(items);
+                result.add(orderWithItems);
+            }
+            
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
 }

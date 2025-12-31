@@ -79,4 +79,9 @@ public class OrderController {
         return orderService.authUpdatStatus(orderId, itemId, status);
     }
 
+    @GetMapping("/past")
+    public ResponseEntity<List<OrderWithItemsDTO>> getPastOrders() {
+        return orderService.findPastOrders();
+    }
+
 }

@@ -19,5 +19,7 @@ public interface PastOrderRepository extends JpaRepository<PastOrder, Long> {
     
     List<PastOrder> findByClientTenant(String clientTenant);
 
+    List<PastOrder> findAllByOrderByCreatedAtDesc();
+
     void deleteByOrderCode(String orderId);
 }
