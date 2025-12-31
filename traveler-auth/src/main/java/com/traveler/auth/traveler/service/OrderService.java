@@ -92,6 +92,7 @@ public class OrderService {
                 orderItem.setReturnDate(backpack.getReturnDate());
                 orderItem.setBagCode(backpack.getCode());
                 orderItem.setStatus(STATUS.PENDING);
+                orderItem.setQty(backpack.getQty());
                 orderItemsRepository.save(orderItem);
             }
         }catch (Exception e){
@@ -264,12 +265,23 @@ public class OrderService {
                     orderItem.setStatus(STATUS.valueOf(status));
                     orderItemsRepository.save(orderItem);
                 }
+                int i = orderItemsRepository.countByOrderAndStatusNot(orderItemOpt.get().getOrder(), STATUS.valueOf(status));
+                if (i == 0){
+                    Order orderItem = orderItemOpt.get().getOrder();
+                    orderItem.setStatus(STATUS.valueOf(status));
+                    orderRepository.save(orderItem);
+                }
             } else {
                 Optional<Order> orderOpt = orderRepository.findByOrderCode(orderId);
                 if (orderOpt.isPresent()) {
                     Order order = orderOpt.get();
                     order.setStatus(STATUS.valueOf(status));
                     orderRepository.save(order);
+                }
+                List<OrderItems> orderItems = orderItemsRepository.findByOrderId(orderOpt.get().getId());
+                for (OrderItems orderItem : orderItems) {
+                    orderItem.setStatus(STATUS.valueOf(status));
+                    orderItemsRepository.save(orderItem);
                 }
             }
             return ResponseEntity.ok("Status updated successfully");

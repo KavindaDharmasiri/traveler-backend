@@ -18,10 +18,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * ALL RIGHT RESERVED By kavinda_d
@@ -449,13 +447,8 @@ public class OrderServiceImpl implements OrderService {
         if (itemId != null){
             Optional<OrderItems> byId = orderItemsRepository.findByBagCode(itemId);
             if (byId.isPresent()) {
-                System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-                System.out.println(authClient.getUserByTenant(TenantContext.getCurrentTenant()).getType());
-                System.out.println(authClient.getUserByTenant(TenantContext.getCurrentTenant()).getType().equals(UserType.TRAVELLER));
                 if (authClient.getUserByTenant(TenantContext.getCurrentTenant()).getType().equals(UserType.TRAVELLER)) {
-                    System.out.println("...........................................................");
                     if (status.equals("ACCEPTED")) {
-                        System.out.println("[[[[[[[[[");
                         saveCart(orderId, itemId, status);
                     }if (status.equals("CANCELLED")) {
                         createPastOrder(byId.get().getOrder(), byId.get(),status);
@@ -465,6 +458,7 @@ public class OrderServiceImpl implements OrderService {
                 }
                 byId.get().setStatus(STATUS.DELETED);
                 orderItemsRepository.save(byId.get());
+                checkOrder(byId.get().getOrder());
 
             }else{
                 Optional<Order> orderOpt = orderRepository.findByOrderCode(orderId);
@@ -528,6 +522,16 @@ public class OrderServiceImpl implements OrderService {
         }catch (Exception e){
             e.printStackTrace();
             return ResponseEntity.badRequest().body("Failed to update order");
+        }
+    }
+
+    private void checkOrder(Order orderCode) {
+        int i = orderItemsRepository.countByOrderAndStatusNot(orderCode, STATUS.DELETED);
+        if (i == 0){
+            orderRepository.findByOrderCode(orderCode.getOrderCode()).ifPresent(order -> {
+                order.setStatus(STATUS.DELETED);
+                orderRepository.save(order);
+            });
         }
     }
 

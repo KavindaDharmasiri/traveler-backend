@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "cart")
@@ -17,6 +18,9 @@ public class Cart {
 
     @Column(name = "order_code", nullable = false)
     private String orderCode;
+
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<CartItems> cartItems;
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
@@ -45,6 +49,14 @@ public class Cart {
 
     public void setOrderCode(String orderCode) {
         this.orderCode = orderCode;
+    }
+
+    public List<CartItems> getCartItems() {
+        return cartItems;
+    }
+
+    public void setCartItems(List<CartItems> cartItems) {
+        this.cartItems = cartItems;
     }
 
     public Date getCreatedAt() {
