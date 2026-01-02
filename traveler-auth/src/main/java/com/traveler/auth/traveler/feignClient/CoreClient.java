@@ -1,19 +1,17 @@
 package com.traveler.auth.traveler.feignClient;
 
 import com.traveler.common.dto.AuthUpdateStatusDTO;
-import com.traveler.common.dto.OrderDTO;
 import com.traveler.common.dto.SeparateSaveOrderDTO;
 import com.traveler.common.dto.provider.ItemDTO;
+import com.traveler.common.dto.provider.SaveTrandDTO;
 import com.traveler.common.dto.traveller.ItemDetailsDTO;
-import com.traveler.common.entity.Backpack;
-import com.traveler.common.entity.Order;
-import com.traveler.common.utils.STATUS;
+import com.traveler.common.entity.Transaction;
+import com.traveler.common.entity.TransactionItem;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @FeignClient(name = "traveler-core", configuration = com.traveler.auth.traveler.config.FeignConfig.class)
 public interface CoreClient {
@@ -32,4 +30,10 @@ public interface CoreClient {
 
     @PostMapping("/api/v1/order/auth-update-status")
     ResponseEntity<String> updateOrderStatus(@RequestBody AuthUpdateStatusDTO map, @RequestHeader("X-Tenant-Id") String tenant);
+
+    @PostMapping("/api/v1/order/auth-update-status-payed")
+    ResponseEntity<String> updateOrderStatusPAYED(@RequestBody AuthUpdateStatusDTO map, @RequestHeader("X-Tenant-Id") String tenant);
+
+    @PostMapping("/api/v1/transaction/provider-tran")
+    void saveTranItemForProvider(@RequestBody SaveTrandDTO item, @RequestHeader("X-Tenant-Id") String providerTenant);
 }

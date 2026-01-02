@@ -15,6 +15,7 @@ import com.traveler.common.dto.traveller.ItemDetailsDTO;
 import com.traveler.common.dto.traveller.ProviderItemGroupDTO;
 import com.traveler.common.entity.Backpack;
 import com.traveler.common.entity.Order;
+import com.traveler.common.entity.Transaction;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -48,6 +49,11 @@ public class OrderController {
         String status = map.get("status");
         String tenant = map.get("tenant");
         return orderService.changeStatus(orderId, itemId, status, tenant);
+    }
+
+    @PostMapping("/saveTran")
+    public ResponseEntity<String> saveTran(@RequestBody List<Transaction> transactions) {
+        return orderService.saveTran(transactions);
     }
 
     @GetMapping()

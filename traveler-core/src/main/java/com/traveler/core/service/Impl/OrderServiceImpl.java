@@ -634,6 +634,18 @@ public class OrderServiceImpl implements OrderService {
                         cart = new Cart();
                         cart.setUserTenant(TenantContext.getCurrentTenant());
                         cart.setOrderCode(orderCode);
+                        Order mainOrderee = orderItem.get().getOrder();
+                        cart.setCustomerName(mainOrderee.getCustomerName());
+                        cart.setItem(mainOrderee.getItem());
+                        cart.setStatus(mainOrderee.getStatus());
+                        cart.setClientTenant(mainOrderee.getClientTenant());
+                        cart.setTotalPrice(mainOrderee.getTotalPrice());
+                        cart.setRentalDays(mainOrderee.getRentalDays());
+                        cart.setProviderTenant(mainOrderee.getProviderTenant());
+                        cart.setPickupDate(mainOrderee.getPickupDate());
+                        cart.setReturnDate(mainOrderee.getReturnDate());
+                        cart.setQty(mainOrderee.getQty());
+
                         cart = cartRepository.save(cart);
                     } else {
                         cart = existingCart.get();
@@ -649,6 +661,7 @@ public class OrderServiceImpl implements OrderService {
                     cartItem.setProviderTenant(orderItem.get().getProviderTenant());
                     cartItem.setPickupDate(orderItem.get().getPickupDate());
                     cartItem.setReturnDate(orderItem.get().getReturnDate());
+                    cartItem.setBagCode(orderItem.get().getBagCode());
                     cartItemsRepository.save(cartItem);
                 }
             } else{
@@ -801,6 +814,29 @@ public class OrderServiceImpl implements OrderService {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @Override
+    public ResponseEntity<String> authUpdatStatusPAYED(String orderId, String itemId, String status) {
+        try {
+            Optional<PastOrderItems> byBagCode = pastOrderItemsRepository.findByBagCode(itemId);
+            if (byBagCode.isPresent()){
+                byBagCode.get().setStatus(STATUS.PAYED);
+                pastOrderItemsRepository.save(byBagCode.get());
+            }
+            int i = pastOrderItemsRepository.countByStatusNot(STATUS.PAYED);
+            if (i == 0 ){
+                Optional<PastOrder> byOrderCode = pastOrderRepository.findByOrderCode(byBagCode.get().getOrder().getOrderCode());
+                if (byOrderCode.isPresent()){
+                    byOrderCode.get().setStatus(STATUS.PAYED);
+                    pastOrderRepository.save(byOrderCode.get());
+                }
+            }
+            return ResponseEntity.ok("Order updated successfully");
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Failed to update order");
         }
     }
 

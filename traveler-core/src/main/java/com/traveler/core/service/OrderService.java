@@ -41,4 +41,6 @@ public interface OrderService {
     ResponseEntity<String> authUpdatStatus(String orderId, String itemId, String status);
 
     ResponseEntity<List<OrderWithItemsDTO>> findPastOrders();
+
+    ResponseEntity<String> authUpdatStatusPAYED(String orderId, String itemId, String status);
 }

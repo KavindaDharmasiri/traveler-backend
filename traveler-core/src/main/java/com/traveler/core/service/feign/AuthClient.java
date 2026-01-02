@@ -9,6 +9,7 @@ import com.traveler.common.dto.traveller.ItemDetailsDTO;
 import com.traveler.common.dto.traveller.ProviderItemGroupDTO;
 import com.traveler.common.entity.Backpack;
 import com.traveler.common.entity.Order;
+import com.traveler.common.entity.Transaction;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -59,4 +60,6 @@ public interface AuthClient {
     @PostMapping("/order/changeStatus")
     String updateOrderStatus(@RequestBody Map map);
 
+    @PostMapping("/order/saveTran")
+    void saveTran(List<Transaction> transactions);
 }

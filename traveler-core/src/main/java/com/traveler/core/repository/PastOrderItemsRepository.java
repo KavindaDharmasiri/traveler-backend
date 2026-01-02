@@ -20,4 +20,6 @@ public interface PastOrderItemsRepository extends JpaRepository<PastOrderItems, 
     void deleteByOrderId(Long order_id);
 
     void deleteByBagCode(String bagCode);
+
+    int countByStatusNot(STATUS status);
 }

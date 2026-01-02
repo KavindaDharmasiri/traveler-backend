@@ -1,6 +1,7 @@
 package com.traveler.common.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
@@ -8,6 +9,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "cart_items")
+@Data
 public class CartItems {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,6 +27,8 @@ public class CartItems {
     private int rentalDays;
     @Column(name = "provider_tenant")
     private String providerTenant;
+    @Column(name = "bag_code")
+    private String bagCode;
     @Column(name = "pickup_date")
     private LocalDate pickupDate;
     @Column(name = "return_date")

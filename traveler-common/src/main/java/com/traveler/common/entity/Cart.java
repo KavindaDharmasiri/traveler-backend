@@ -1,13 +1,18 @@
 package com.traveler.common.entity;
 
+import com.traveler.common.utils.STATUS;
 import jakarta.persistence.*;
+import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
 @Entity
 @Table(name = "cart")
+@Data
 public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +31,28 @@ public class Cart {
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
     private Date createdAt;
+
+    @Column(name = "customer_name", nullable = false)
+    private String customerName;
+    private int item;
+    private int qty;
+    @Column(name = "updated_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    @UpdateTimestamp
+    private Date updatedAt;
+    private STATUS status;
+    @Column(name = "rental")
+    private double totalPrice;
+    @Column(name = "rental_days")
+    private int rentalDays;
+    @Column(name = "client_tenant")
+    private String clientTenant;
+    @Column(name = "provider_tenant")
+    private String providerTenant;
+    @Column(name = "pickup_date")
+    private LocalDate pickupDate;
+    @Column(name = "return_date")
+    private LocalDate returnDate;
 
     public Long getId() {
         return id;

@@ -2,22 +2,20 @@ package com.traveler.auth.traveler.service;
 
 import com.traveler.auth.traveler.entity.User;
 import com.traveler.auth.traveler.feignClient.CoreClient;
-import com.traveler.auth.traveler.repository.OrderRepository;
-import com.traveler.auth.traveler.repository.OrderItemsRepository;
-import com.traveler.auth.traveler.repository.UserRepository;
+import com.traveler.auth.traveler.repository.*;
 import com.traveler.auth.traveler.utils.UserType;
 import com.traveler.common.dto.AuthUpdateStatusDTO;
 import com.traveler.common.dto.OrderDTO;
 import com.traveler.common.dto.SeparateSaveOrderDTO;
 import com.traveler.common.dto.provider.ItemDTO;
+import com.traveler.common.dto.provider.SaveTrandDTO;
 import com.traveler.common.dto.traveller.ItemDetailsDTO;
 import com.traveler.common.dto.traveller.ProviderItemGroupDTO;
-import com.traveler.common.entity.Backpack;
-import com.traveler.common.entity.Order;
-import com.traveler.common.entity.OrderItems;
+import com.traveler.common.entity.*;
 import com.traveler.common.utils.STATUS;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,12 +31,16 @@ import java.util.stream.Collectors;
 public class OrderService {
     private final CoreClient coreClient;
     private final OrderRepository orderRepository;
+    private final TransactionRepository transactionRepository;
+    private final TransactionItemRepository transactionItemRepository;
     private final OrderItemsRepository orderItemsRepository;
     private final UserRepository userRepository;
 
-    public OrderService(CoreClient coreClient, OrderRepository orderRepository, OrderItemsRepository orderItemsRepository, UserRepository userRepository) {
+    public OrderService(CoreClient coreClient, OrderRepository orderRepository, TransactionRepository transactionRepository, TransactionItemRepository transactionItemRepository, OrderItemsRepository orderItemsRepository, UserRepository userRepository) {
         this.coreClient = coreClient;
         this.orderRepository = orderRepository;
+        this.transactionRepository = transactionRepository;
+        this.transactionItemRepository = transactionItemRepository;
         this.orderItemsRepository = orderItemsRepository;
         this.userRepository = userRepository;
     }
@@ -287,6 +289,167 @@ public class OrderService {
             return ResponseEntity.ok("Status updated successfully");
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public ResponseEntity<String> changeStatusPAYED(String orderId, String itemId, String status, String tenant) {
+        try{
+            AuthUpdateStatusDTO map = new AuthUpdateStatusDTO();
+            map.setOrderId(orderId);
+            map.setItemId(itemId);
+            map.setStatus(status);
+            coreClient.updateOrderStatusPAYED(map, tenant);
+
+            if (itemId != null) {
+                Optional<OrderItems> orderItemOpt = orderItemsRepository.findByBagCode(itemId);
+                if (orderItemOpt.isPresent()) {
+                    OrderItems orderItem = orderItemOpt.get();
+                    orderItem.setStatus(STATUS.valueOf(status));
+                    orderItemsRepository.save(orderItem);
+                }
+                int i = orderItemsRepository.countByOrderAndStatusNot(orderItemOpt.get().getOrder(), STATUS.valueOf(status));
+                if (i == 0){
+                    Order orderItem = orderItemOpt.get().getOrder();
+                    orderItem.setStatus(STATUS.valueOf(status));
+                    orderRepository.save(orderItem);
+                }
+            } else {
+                Optional<Order> orderOpt = orderRepository.findByOrderCode(orderId);
+                if (orderOpt.isPresent()) {
+                    Order order = orderOpt.get();
+                    order.setStatus(STATUS.valueOf(status));
+                    orderRepository.save(order);
+                }
+                List<OrderItems> orderItems = orderItemsRepository.findByOrderId(orderOpt.get().getId());
+                for (OrderItems orderItem : orderItems) {
+                    orderItem.setStatus(STATUS.valueOf(status));
+                    orderItemsRepository.save(orderItem);
+                }
+            }
+            return ResponseEntity.ok("Status updated successfully");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public ResponseEntity<String> saveTran(List<Transaction> transactions) {
+        try {
+            for (Transaction transaction : transactions) {
+                Optional<Transaction> existingTran = transactionRepository.findByTransactionCode(transaction.getTransactionCode());
+                
+                if (existingTran.isPresent()) {
+                    // Just process status updates for existing transaction items
+                    for (TransactionItem item : transaction.getTransactionItems()) {
+                        try {
+                            changeStatusPAYED(null, item.getBagCode(), STATUS.PAYED.name(), item.getProviderTenant());
+                        } catch (Exception e) {
+                            System.err.println("Failed to update status for item: " + item.getBagCode());
+                        }
+                    }
+                } else {
+                    Transaction transaction1 = makeTranObhj(transaction);
+                    // Save new transaction
+//                    Transaction savedTransaction = transactionRepository.findByTransactionCode(transaction1.getTransactionCode()).get();
+                    for (TransactionItem item : transaction.getTransactionItems()) {
+                        try {
+                            changeStatusPAYED(null, item.getBagCode(), STATUS.PAYED.name(), item.getProviderTenant());
+                        } catch (Exception e) {
+                            System.err.println("Failed to update status for item: " + item.getBagCode());
+                        }
+                    }
+                }
+            }
+            
+            try {
+                saveTranForProvider(transactions);
+            } catch (Exception e) {
+                System.err.println("Failed to save provider transactions: " + e.getMessage());
+            }
+            
+            return ResponseEntity.ok().body("save transactions");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Failed to save transactions");
+        }
+    }
+
+    private Transaction makeTranObhj(Transaction transaction) {
+        Transaction transaction1 = new Transaction();
+        transaction1.setTransactionCode(transaction.getTransactionCode());
+        transaction1.setUserTenant(transaction.getUserTenant());
+        transaction1.setCustomerName(transaction.getCustomerName());
+        transaction1.setCustomerTenant(transaction.getCustomerTenant());
+        transaction1.setOrderCodes(transaction.getOrderCodes());
+        transaction1.setSubtotal(transaction.getSubtotal());
+        transaction1.setTaxAmount(transaction.getTaxAmount());
+        transaction1.setTaxRate(transaction.getTaxRate());
+        transaction1.setPaymentMethod(transaction.getPaymentMethod());
+        transaction1.setPaymentStatus(transaction.getPaymentStatus());
+        transaction1.setTotalAmount(transaction.getTotalAmount());
+        transaction1.setVersion((long) 1.0);
+        Transaction save = transactionRepository.save(transaction1);
+
+        transaction.getTransactionItems().forEach(item -> {
+            TransactionItem transactionItem = new TransactionItem();
+            transactionItem.setTransaction(save);
+            transactionItem.setOrderCode(item.getOrderCode());
+            transactionItem.setCartId(0L);
+            transactionItem.setItemId(item.getItemId());
+            transactionItem.setItemName(item.getItemName());
+            transactionItem.setProviderName(item.getProviderName());
+            transactionItem.setBagCode(item.getBagCode());
+            transactionItem.setProviderTenant(item.getProviderTenant());
+            transactionItem.setQuantity(item.getQuantity());
+            transactionItem.setRentalDays(item.getRentalDays());
+            transactionItem.setPickupDate(item.getPickupDate());
+            transactionItem.setReturnDate(item.getReturnDate());
+            transactionItem.setItemPrice(item.getItemPrice());
+            transactionItemRepository.save(transactionItem);
+        });
+        return save;
+    }
+
+    private void saveTranForProvider(List<Transaction> transactions) {
+        try{
+            for (Transaction transaction : transactions) {
+                // Create new Transaction without ID
+                Transaction newTransaction = new Transaction();
+                newTransaction.setTransactionCode(transaction.getTransactionCode());
+                newTransaction.setUserTenant(transaction.getUserTenant());
+                newTransaction.setCustomerName(transaction.getCustomerName());
+                newTransaction.setCustomerTenant(transaction.getCustomerTenant());
+                newTransaction.setOrderCodes(transaction.getOrderCodes());
+                newTransaction.setSubtotal(transaction.getSubtotal());
+                newTransaction.setTaxAmount(transaction.getTaxAmount());
+                newTransaction.setTaxRate(transaction.getTaxRate());
+                newTransaction.setPaymentMethod(transaction.getPaymentMethod());
+                newTransaction.setPaymentStatus(transaction.getPaymentStatus());
+                newTransaction.setTotalAmount(transaction.getTotalAmount());
+                
+                for (TransactionItem item : transaction.getTransactionItems()) {
+                    SaveTrandDTO saveTrandDTO = new SaveTrandDTO();
+                    // Create new TransactionItem without ID
+                    TransactionItem newItem = new TransactionItem();
+                    newItem.setOrderCode(item.getOrderCode());
+                    newItem.setCartId(item.getCartId());
+                    newItem.setItemId(item.getItemId());
+                    newItem.setItemName(item.getItemName());
+                    newItem.setProviderName(item.getProviderName());
+                    newItem.setBagCode(item.getBagCode());
+                    newItem.setProviderTenant(item.getProviderTenant());
+                    newItem.setQuantity(item.getQuantity());
+                    newItem.setRentalDays(item.getRentalDays());
+                    newItem.setPickupDate(item.getPickupDate());
+                    newItem.setReturnDate(item.getReturnDate());
+                    newItem.setItemPrice(item.getItemPrice());
+                    
+                    saveTrandDTO.setItem(newItem);
+                    saveTrandDTO.setTransaction(newTransaction);
+                    coreClient.saveTranItemForProvider(saveTrandDTO,item.getProviderTenant());
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 }

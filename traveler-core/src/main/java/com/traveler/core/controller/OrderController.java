@@ -79,6 +79,14 @@ public class OrderController {
         return orderService.authUpdatStatus(orderId, itemId, status);
     }
 
+    @PostMapping("/auth-update-status-payed")
+    public ResponseEntity<String> authUpdatStatusPAYED(@RequestBody AuthUpdateStatusDTO map) {
+        String orderId = map.getOrderId();
+        String itemId = map.getItemId();
+        String status = map.getStatus();
+        return orderService.authUpdatStatusPAYED(orderId, itemId, status);
+    }
+
     @GetMapping("/past")
     public ResponseEntity<List<OrderWithItemsDTO>> getPastOrders() {
         return orderService.findPastOrders();
