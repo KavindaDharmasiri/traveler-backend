@@ -33,6 +33,7 @@ public class OrderDTO {
     private String providerName;
     private String map;
     private String contact;
+    private String updateDate;
 
     public Long getId() {
         return id;
@@ -176,5 +177,13 @@ public class OrderDTO {
 
     public void setContact(String contact) {
         this.contact = contact;
+    }
+
+    public String getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(String updateDate) {
+        this.updateDate = updateDate;
     }
 }

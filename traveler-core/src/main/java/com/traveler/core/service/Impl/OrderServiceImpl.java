@@ -189,6 +189,7 @@ public class OrderServiceImpl implements OrderService {
                         orderDTO.setProviderTenant(orderItem.getProviderTenant());
                         orderDTO.setPickupDate(orderItem.getPickupDate().toString());
                         orderDTO.setReturnDate(orderItem.getReturnDate().toString());
+                        orderDTO.setUpdateDate(orderItem.getCreatedAt().toString());
 
                         String groupTenant = isServiceProvider ? order.getClientTenant() : orderItem.getProviderTenant();
                         var tenantUser = authClient.getUserByTenant(groupTenant);
