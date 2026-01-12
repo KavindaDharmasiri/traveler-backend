@@ -264,8 +264,17 @@ public class UserService implements UserDetailsService {
         return users.stream().map(this::mapToUserResponse).toList();
     }
     
-    public List<UserResponse> getPendingUsers() {
-        List<User> users = userRepository.findAllByIsActive(false);
+    public List<UserResponse> getPendingUsers(String startDate, String endDate) {
+        List<User> users;
+        
+        if (startDate != null && endDate != null) {
+            LocalDateTime start = LocalDate.parse(startDate).atStartOfDay();
+            LocalDateTime end = LocalDate.parse(endDate).atTime(23, 59, 59);
+            users = userRepository.findByIsActiveFalseAndCreatedAtBetweenOrderByCreatedAtDesc(start, end);
+        } else {
+            users = userRepository.findAllByIsActiveOrderByCreatedAtDesc(false);
+        }
+        
         return users.stream().map(this::mapToUserResponse).toList();
     }
     
@@ -388,5 +397,22 @@ public class UserService implements UserDetailsService {
         stats.put("failedTransactions", failedCount);
         
         return stats;
+    }
+    
+    public void updateUserStatus(Long userId, String status, String reason) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        if ("approve".equalsIgnoreCase(status)) {
+            user.setIsActive(true);
+            user.setRejectionReason(null); // Clear any previous rejection reason
+        } else if ("reject".equalsIgnoreCase(status)) {
+            user.setIsActive(false);
+            user.setRejectionReason(reason);
+        } else {
+            throw new RuntimeException("Invalid status: " + status);
+        }
+        
+        userRepository.save(user);
     }
 }

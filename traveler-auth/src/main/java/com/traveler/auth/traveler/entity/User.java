@@ -72,6 +72,9 @@ public class User {
     @Column(nullable = false, name = "is_active")
     private Boolean isActive = true;
     
+    @Column(name = "rejection_reason")
+    private String rejectionReason;
+    
     @Column(nullable = false, name = "tenant_id", unique = true)
     private String tenantId;
 

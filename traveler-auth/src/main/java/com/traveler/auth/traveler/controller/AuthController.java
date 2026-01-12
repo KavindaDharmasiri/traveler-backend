@@ -139,8 +139,10 @@ public class AuthController {
     }
 
     @GetMapping("/users/pending")
-    public ResponseEntity<List<UserResponse>> getPendingUsers() {
-        List<UserResponse> users = userService.getPendingUsers();
+    public ResponseEntity<List<UserResponse>> getPendingUsers(
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
+        List<UserResponse> users = userService.getPendingUsers(startDate, endDate);
         return ResponseEntity.ok(users);
     }
 
@@ -176,6 +178,16 @@ public class AuthController {
             return ResponseEntity.ok(stats);
         } catch (Exception e) {
             return ResponseEntity.status(500).build();
+        }
+    }
+
+    @PutMapping("/users/{id}/status")
+    public ResponseEntity<String> updateUserStatus(@PathVariable Long id, @RequestParam String status, @RequestParam(required = false) String reason) {
+        try {
+            userService.updateUserStatus(id, status, reason);
+            return ResponseEntity.ok("User status updated successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to update user status");
         }
     }
 
