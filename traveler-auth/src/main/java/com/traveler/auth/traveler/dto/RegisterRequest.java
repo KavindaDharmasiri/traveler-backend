@@ -4,6 +4,7 @@ import com.traveler.auth.traveler.utils.UserType;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import java.time.LocalDate;
+import java.util.List;
 import jakarta.validation.constraints.Pattern;
 
 @Data
@@ -25,10 +26,6 @@ public class RegisterRequest {
     @NotBlank
     @Email
     private String email;
-
-//    @NotBlank
-//    @Email
-//    private String uniqIdentifier;
     
     @NotBlank
     @Size(min = 8, message = "Password must be at least 8 characters")
@@ -41,10 +38,21 @@ public class RegisterRequest {
     private String nicNumber;
     
     private String nicImageUuid;
+    private String nicBackUuid;
     private String googleMapsUrl;
 
     @NotNull
     private AddressDto address;
     
     private BankDetailsDto bankDetails;
+    
+    private java.util.Map<String, Object> permissions; // Add permissions field
+    
+    private List<DocumentDto> documents; // Documents for providers
+    
+    @Data
+    public static class DocumentDto {
+        private String docName;
+        private String docUuid;
+    }
 }

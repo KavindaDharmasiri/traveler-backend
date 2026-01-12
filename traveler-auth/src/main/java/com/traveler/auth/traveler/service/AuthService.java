@@ -1,5 +1,6 @@
 package com.traveler.auth.traveler.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.traveler.auth.traveler.dto.*;
 import com.traveler.auth.traveler.entity.*;
 import com.traveler.auth.traveler.exception.AuthException;
@@ -12,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -20,17 +22,22 @@ public class AuthService {
     
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final UserPermissionsRepository userPermissionsRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final SecurityService securityService;
+    private final ObjectMapper objectMapper;
     
     public AuthService(UserRepository userRepository, RefreshTokenRepository refreshTokenRepository, 
-                      PasswordEncoder passwordEncoder, JwtUtil jwtUtil, SecurityService securityService) {
+                      UserPermissionsRepository userPermissionsRepository, PasswordEncoder passwordEncoder, 
+                      JwtUtil jwtUtil, SecurityService securityService) {
         this.userRepository = userRepository;
         this.refreshTokenRepository = refreshTokenRepository;
+        this.userPermissionsRepository = userPermissionsRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.securityService = securityService;
+        this.objectMapper = new ObjectMapper();
     }
     
     @Transactional
@@ -55,8 +62,14 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setDateOfBirth(request.getDateOfBirth());
         user.setNicNumber(request.getNicNumber());
+        if (request.getType() == UserType.TRAVELLER) {
+            user.setIsActive(true);
+        } else {
+            user.setIsActive(false);
+        }
 //        user.setUniqIdentifier(request.getNicNumber());
         user.setNicImageUuid(request.getNicImageUuid());
+        user.setNicImageUuidBack(request.getNicBackUuid());
         user.setTenantId(generateTenantId(request.getNicNumber()));
         user.setIsEmailVerified(false);
         user.setCountry(request.getCountry());
@@ -81,6 +94,19 @@ public class AuthService {
         }
         
         user = userRepository.save(user);
+        
+        // Save permissions if provided (for admin users)
+        if (request.getPermissions() != null && !request.getPermissions().isEmpty()) {
+            try {
+                UserPermissions userPermissions = new UserPermissions();
+                userPermissions.setUserId(user.getId());
+                userPermissions.setPermissions(objectMapper.writeValueAsString(request.getPermissions()));
+                userPermissionsRepository.save(userPermissions);
+                log.info("Permissions saved for user: {}", user.getId());
+            } catch (Exception e) {
+                log.error("Failed to save permissions for user: {}", user.getId(), e);
+            }
+        }
         
         String accessToken = jwtUtil.generateToken(user.getEmail(), user.getId());
         String refreshToken = createRefreshToken(user);
@@ -191,6 +217,21 @@ public class AuthService {
         response.setCountry(user.getCountry());
         response.setNumberVerified(user.getIsNumberVerified());
         response.setEmailVerified(user.getIsEmailVerified());
+        
+        // Get permissions if user is admin
+        if (user.getType() == UserType.ADMIN || user.getType() == UserType.SUPER_ADMIN) {
+            try {
+                userPermissionsRepository.findByUserId(user.getId()).ifPresent(userPermissions -> {
+                    try {
+                        response.setPermissions(objectMapper.readValue(userPermissions.getPermissions(), Map.class));
+                    } catch (Exception e) {
+                        log.error("Failed to parse permissions for user: {}", user.getId(), e);
+                    }
+                });
+            } catch (Exception e) {
+                log.error("Failed to get permissions for user: {}", user.getId(), e);
+            }
+        }
 
         return response;
     }

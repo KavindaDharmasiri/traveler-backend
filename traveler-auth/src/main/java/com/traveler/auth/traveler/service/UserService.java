@@ -271,6 +271,29 @@ public class UserService implements UserDetailsService {
         response.setProfileImageUuid(user.getProfileImageUuid());
         response.setCountry(user.getCountry());
         response.setGoogleMapsUrl(user.getGoogleMapsUrl());
+        response.setIsActive(user.getIsActive());
+        
+        // Add address mapping
+        if (user.getAddress() != null) {
+            AddressDto addressDto = new AddressDto();
+            addressDto.setStreet1(user.getAddress().getStreet1());
+            addressDto.setStreet2(user.getAddress().getStreet2());
+            addressDto.setCity(user.getAddress().getCity());
+            addressDto.setState(user.getAddress().getState());
+            addressDto.setPostalCode(user.getAddress().getPostalCode());
+            response.setAddress(addressDto);
+        }
+        
+        // Add bank details mapping
+        if (user.getBankDetails() != null) {
+            BankDetailsDto bankDto = new BankDetailsDto();
+            bankDto.setAccountNumber(user.getBankDetails().getAccountNumber());
+            bankDto.setHolderName(user.getBankDetails().getHolderName());
+            bankDto.setBank(user.getBankDetails().getBank());
+            bankDto.setBranch(user.getBankDetails().getBranch());
+            response.setBankDetails(bankDto);
+        }
+        
         return response;
     }
     
@@ -283,5 +306,11 @@ public class UserService implements UserDetailsService {
             digits = digits.substring(2);
         }
         return digits;
+    }
+    
+    public UserResponse getUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return mapToUserResponse(user);
     }
 }

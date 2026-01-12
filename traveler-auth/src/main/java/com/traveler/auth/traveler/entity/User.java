@@ -54,6 +54,9 @@ public class User {
 
     @Column(name = "nic_image_uuid")
     private String nicImageUuid;
+
+    @Column(name = "nic_image_uuid_back")
+    private String nicImageUuidBack;
     
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id")

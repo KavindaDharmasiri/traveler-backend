@@ -15,4 +15,5 @@ public class AuthResponse {
     private String country;
     private boolean numberVerified;
     private boolean emailVerified;
+    private java.util.Map<String, Object> permissions;
 }

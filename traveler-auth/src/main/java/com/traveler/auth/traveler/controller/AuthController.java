@@ -144,4 +144,14 @@ public class AuthController {
         return ResponseEntity.ok(users);
     }
 
+    @GetMapping("/users/{id}")
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
+        try {
+            UserResponse user = userService.getUserById(id);
+            return ResponseEntity.ok(user);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }

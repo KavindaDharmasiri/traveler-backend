@@ -21,6 +21,7 @@ public class UserResponse {
     private String googleMapsUrl;
     private String country;
     private String profileImageUuid;
+    private Boolean isActive;
     private AddressDto address;
     private BankDetailsDto bankDetails;
 }
