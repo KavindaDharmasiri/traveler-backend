@@ -3,22 +3,35 @@ package com.traveler.auth.traveler.service;
 import com.traveler.auth.traveler.dto.*;
 import com.traveler.auth.traveler.entity.User;
 import com.traveler.auth.traveler.repository.UserRepository;
+import com.traveler.auth.traveler.repository.TransactionRepository;
 import com.traveler.auth.traveler.dto.ProfileUpdateDTO;
 import com.traveler.auth.traveler.utils.UserType;
+import com.traveler.common.entity.Transaction;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserService implements UserDetailsService {
     
     private final UserRepository userRepository;
+    private final TransactionRepository transactionRepository;
     
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, TransactionRepository transactionRepository) {
         this.userRepository = userRepository;
+        this.transactionRepository = transactionRepository;
     }
     
     @Override
@@ -312,5 +325,51 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return mapToUserResponse(user);
+    }
+    
+    public Map<String, Object> getAllTransactions(int page, int size, String startDate, String endDate, String customerName) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<Transaction> transactionPage;
+        
+        if (startDate != null && endDate != null && customerName != null) {
+            LocalDateTime start = LocalDate.parse(startDate).atStartOfDay();
+            LocalDateTime end = LocalDate.parse(endDate).atTime(23, 59, 59);
+            transactionPage = transactionRepository.findByCreatedAtBetweenAndCustomerNameContainingIgnoreCase(start, end, customerName, pageable);
+        } else if (startDate != null && endDate != null) {
+            LocalDateTime start = LocalDate.parse(startDate).atStartOfDay();
+            LocalDateTime end = LocalDate.parse(endDate).atTime(23, 59, 59);
+            transactionPage = transactionRepository.findByCreatedAtBetween(start, end, pageable);
+        } else if (customerName != null) {
+            transactionPage = transactionRepository.findByCustomerNameContainingIgnoreCase(customerName, pageable);
+        } else {
+            transactionPage = transactionRepository.findAll(pageable);
+        }
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("transactions", transactionPage.getContent());
+        response.put("currentPage", transactionPage.getNumber());
+        response.put("totalItems", transactionPage.getTotalElements());
+        response.put("totalPages", transactionPage.getTotalPages());
+        response.put("hasNext", transactionPage.hasNext());
+        response.put("hasPrevious", transactionPage.hasPrevious());
+        
+        return response;
+    }
+    
+    public Map<String, Object> getTransactionStats() {
+        List<Transaction> allTransactions = transactionRepository.findAll();
+        
+        double totalVolume = allTransactions.stream().mapToDouble(Transaction::getTotalAmount).sum();
+        double totalCommission = allTransactions.stream().mapToDouble(Transaction::getTaxAmount).sum();
+        long successCount = allTransactions.stream().filter(t -> "COMPLETED".equals(t.getPaymentStatus())).count();
+        long failedCount = allTransactions.stream().filter(t -> "FAILED".equals(t.getPaymentStatus())).count();
+        
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("totalVolume", totalVolume);
+        stats.put("netCommission", totalCommission);
+        stats.put("successPayments", successCount);
+        stats.put("failedTransactions", failedCount);
+        
+        return stats;
     }
 }

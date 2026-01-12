@@ -154,4 +154,29 @@ public class AuthController {
         }
     }
 
+    @GetMapping("/transactions")
+    public ResponseEntity<Map<String, Object>> getAllTransactions(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
+            @RequestParam(required = false) String customerName) {
+        try {
+            Map<String, Object> response = userService.getAllTransactions(page, size, startDate, endDate, customerName);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    @GetMapping("/transactions/stats")
+    public ResponseEntity<Map<String, Object>> getTransactionStats() {
+        try {
+            Map<String, Object> stats = userService.getTransactionStats();
+            return ResponseEntity.ok(stats);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+
 }

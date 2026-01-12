@@ -23,17 +23,19 @@ public class AuthService {
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserPermissionsRepository userPermissionsRepository;
+    private final UserDocumentRepository userDocumentRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final SecurityService securityService;
     private final ObjectMapper objectMapper;
     
     public AuthService(UserRepository userRepository, RefreshTokenRepository refreshTokenRepository, 
-                      UserPermissionsRepository userPermissionsRepository, PasswordEncoder passwordEncoder, 
-                      JwtUtil jwtUtil, SecurityService securityService) {
+                      UserPermissionsRepository userPermissionsRepository, UserDocumentRepository userDocumentRepository,
+                      PasswordEncoder passwordEncoder, JwtUtil jwtUtil, SecurityService securityService) {
         this.userRepository = userRepository;
         this.refreshTokenRepository = refreshTokenRepository;
         this.userPermissionsRepository = userPermissionsRepository;
+        this.userDocumentRepository = userDocumentRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.securityService = securityService;
@@ -105,6 +107,22 @@ public class AuthService {
                 log.info("Permissions saved for user: {}", user.getId());
             } catch (Exception e) {
                 log.error("Failed to save permissions for user: {}", user.getId(), e);
+            }
+        }
+        
+        // Save documents if type is PROVIDER
+        if (request.getType() == UserType.SERVICE_PROVIDER && request.getDocuments() != null && !request.getDocuments().isEmpty()) {
+            try {
+                for (RegisterRequest.DocumentDto doc : request.getDocuments()) {
+                    UserDocument userDocument = new UserDocument();
+                    userDocument.setUser(user);
+                    userDocument.setDocName(doc.getDocName());
+                    userDocument.setDocUuid(doc.getDocUuid());
+                    userDocumentRepository.save(userDocument);
+                }
+                log.info("Documents saved for provider: {}", user.getId());
+            } catch (Exception e) {
+                log.error("Failed to save documents for provider: {}", user.getId(), e);
             }
         }
         
