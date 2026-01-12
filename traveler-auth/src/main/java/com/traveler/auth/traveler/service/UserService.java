@@ -28,10 +28,12 @@ public class UserService implements UserDetailsService {
     
     private final UserRepository userRepository;
     private final TransactionRepository transactionRepository;
+    private final com.traveler.auth.traveler.repository.UserDocumentRepository userDocumentRepository;
     
-    public UserService(UserRepository userRepository, TransactionRepository transactionRepository) {
+    public UserService(UserRepository userRepository, TransactionRepository transactionRepository, com.traveler.auth.traveler.repository.UserDocumentRepository userDocumentRepository) {
         this.userRepository = userRepository;
         this.transactionRepository = transactionRepository;
+        this.userDocumentRepository = userDocumentRepository;
     }
     
     @Override
@@ -280,6 +282,7 @@ public class UserService implements UserDetailsService {
         response.setDateOfBirth(user.getDateOfBirth());
         response.setNicNumber(user.getNicNumber());
         response.setNicImageUuid(user.getNicImageUuid());
+        response.setNicImageBackUuid(user.getNicImageUuidBack());
         response.setTenantId(user.getTenantId());
         response.setProfileImageUuid(user.getProfileImageUuid());
         response.setCountry(user.getCountry());
@@ -305,6 +308,20 @@ public class UserService implements UserDetailsService {
             bankDto.setBank(user.getBankDetails().getBank());
             bankDto.setBranch(user.getBankDetails().getBranch());
             response.setBankDetails(bankDto);
+        }
+        
+        // Add documents mapping
+        List<com.traveler.auth.traveler.entity.UserDocument> userDocuments = userDocumentRepository.findByUserId(user.getId());
+        if (!userDocuments.isEmpty()) {
+            List<UserResponse.DocumentDto> documentDtos = userDocuments.stream()
+                .map(doc -> {
+                    UserResponse.DocumentDto dto = new UserResponse.DocumentDto();
+                    dto.setDocName(doc.getDocName());
+                    dto.setDocUuid(doc.getDocUuid());
+                    return dto;
+                })
+                .toList();
+            response.setDocuments(documentDtos);
         }
         
         return response;
