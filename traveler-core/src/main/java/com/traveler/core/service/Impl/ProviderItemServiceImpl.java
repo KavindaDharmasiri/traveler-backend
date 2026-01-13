@@ -161,6 +161,35 @@ public class ProviderItemServiceImpl implements ProviderItemService {
     }
 
     @Override
+    public ResponseEntity<List<ItemDTO>> getItemsWithStatus(String status) {
+        try {
+            List<Item> all = itemRepository.findAllByStatus(STATUS.valueOf(status));
+            List<ItemDTO> itemDTOs = all.stream()
+                    .map(this::convertToDTO)
+                    .toList();
+            System.out.println(itemDTOs.size());
+            return ResponseEntity.ok(itemDTOs);
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.ok(null);
+        }
+    }
+
+    @Override
+    public ResponseEntity<String> updateItemStatus(String status, long id) {
+        try{
+         itemRepository.findById(id).ifPresent(item -> {
+             item.setStatus(STATUS.valueOf(status));
+             itemRepository.save(item);
+         });
+         return ResponseEntity.ok("DONE");
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.ok("ERROR");
+        }
+    }
+
+    @Override
     public ResponseEntity<List<ItemDTO>> getItems() {
         try {
             List<Item> all = itemRepository.findAll();
@@ -197,6 +226,7 @@ public class ProviderItemServiceImpl implements ProviderItemService {
         dto.setStatus(item.getStatus());
         dto.setCurrency(item.getCurrency());
         dto.setOverallRating(item.getOverallRating());
+        dto.setTenant(TenantContext.getCurrentTenant());
         dto.setQty(item.getQty());
         dto.setImages(List.of(item.getImages().split(",")));
         

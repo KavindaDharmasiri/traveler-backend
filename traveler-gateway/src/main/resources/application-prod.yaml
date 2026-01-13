@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: traveler-gateway
+  config:
+    import: optional:configserver:http://traveler-config:8888

@@ -2,10 +2,12 @@ package com.traveler.auth.traveler.controller;
 
 import com.traveler.auth.traveler.dto.*;
 import com.traveler.auth.traveler.service.AuthService;
+import com.traveler.auth.traveler.service.OrderService;
 import com.traveler.auth.traveler.service.UserService;
 import com.traveler.auth.traveler.dto.ProfileUpdateDTO;
 
 import com.traveler.auth.traveler.utils.UserType;
+import com.traveler.common.dto.provider.ItemDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +24,12 @@ public class AuthController {
     
     private final AuthService authService;
     private final UserService userService;
-    
-    public AuthController(AuthService authService, UserService userService) {
+    private final OrderService orderService;
+
+    public AuthController(AuthService authService, UserService userService, OrderService orderService) {
         this.authService = authService;
         this.userService = userService;
+        this.orderService = orderService;
     }
     
     @PostMapping("/register")
@@ -189,6 +193,32 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Failed to update user status");
         }
+    }
+
+    @GetMapping("/items")
+    public ResponseEntity<List<ItemDTO>> getItemsByStatus(@RequestParam(required = false) String status) {
+        try {
+            List<ItemDTO> items = userService.getItemsByStatus(status,null);
+            return ResponseEntity.ok(items);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    @PutMapping("/items/changestatus")
+    public ResponseEntity<String> updateItemStatus(@RequestParam String tenant, @RequestParam String status, @RequestParam long id) {
+        try {
+            return userService.updateItemStatus(tenant, status, id);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to update user status");
+        }
+    }
+
+    @PostMapping("/getItem")
+    public ResponseEntity<Map<String, Object>> getItemForTraveler(@RequestBody Map<String, Object> request) {
+        Long itemId = Long.valueOf(request.get("itemId").toString());
+        String tenant = request.get("tenant").toString();
+        return orderService.getItemForTraveler2(itemId,tenant);
     }
 
 }

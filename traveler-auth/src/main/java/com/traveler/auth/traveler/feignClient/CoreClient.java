@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @FeignClient(name = "traveler-core", configuration = com.traveler.auth.traveler.config.FeignConfig.class)
 public interface CoreClient {
@@ -36,4 +37,10 @@ public interface CoreClient {
 
     @PostMapping("/api/v1/transaction/provider-tran")
     void saveTranItemForProvider(@RequestBody SaveTrandDTO item, @RequestHeader("X-Tenant-Id") String providerTenant);
+
+    @GetMapping("/api/v1/provider/item/status")
+    ResponseEntity<List<ItemDTO>> getItemsWithStatus(@RequestParam String status, @RequestHeader("X-Tenant-Id") String providerTenant);
+
+    @PutMapping("/api/v1/provider/item/status_update")
+    ResponseEntity<String> updateStatusOfItem(Map status, @RequestHeader("X-Tenant-Id") String tenant);
 }

@@ -1,0 +1,158 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: traveler-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: traveler_db
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - traveler-network
+
+  traveler-config:
+    build:
+      context: ./traveler-config
+      dockerfile: Dockerfile
+    container_name: traveler-config
+    ports:
+      - "8888:8888"
+    networks:
+      - traveler-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod,native
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8888/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  traveler-discovery:
+    build:
+      context: ./traveler-discovery
+      dockerfile: Dockerfile
+    container_name: traveler-discovery
+    ports:
+      - "8761:8761"
+    depends_on:
+      - traveler-config
+    networks:
+      - traveler-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8761/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  traveler-gateway:
+    build:
+      context: ./traveler-gateway
+      dockerfile: Dockerfile
+    container_name: traveler-gateway
+    ports:
+      - "5555:5555"
+    depends_on:
+      - traveler-config
+      - traveler-discovery
+    networks:
+      - traveler-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+
+  traveler-auth:
+    build:
+      context: ./traveler-auth
+      dockerfile: Dockerfile
+    container_name: traveler-auth
+    ports:
+      - "8081:8081"
+    depends_on:
+      traveler-config:
+        condition: service_healthy
+      mysql:
+        condition: service_started
+      traveler-discovery:
+        condition: service_healthy
+    networks:
+      - traveler-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+
+  traveler-core:
+    build:
+      context: ./traveler-core
+      dockerfile: Dockerfile
+    container_name: traveler-core
+    ports:
+      - "8084:8084"
+    depends_on:
+      - mysql
+      - traveler-config
+      - traveler-discovery
+    networks:
+      - traveler-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+
+  traveler-storage:
+    build:
+      context: ./traveler-storage
+      dockerfile: Dockerfile
+    container_name: traveler-storage
+    ports:
+      - "8082:8082"
+    depends_on:
+      - mysql
+      - traveler-config
+      - traveler-discovery
+    networks:
+      - traveler-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    volumes:
+      - ./uploads:/app/uploads
+
+  traveler-notification:
+    build:
+      context: ./traveler-notification
+      dockerfile: Dockerfile
+    container_name: traveler-notification
+    ports:
+      - "8086:8086"
+    depends_on:
+      - mysql
+      - traveler-config
+      - traveler-discovery
+    networks:
+      - traveler-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+
+  traveler-payment:
+    build:
+      context: ./traveler-payment
+      dockerfile: Dockerfile
+    container_name: traveler-payment
+    ports:
+      - "8085:8085"
+    depends_on:
+      - mysql
+      - traveler-config
+      - traveler-discovery
+    networks:
+      - traveler-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+
+volumes:
+  mysql_data:
+
+networks:
+  traveler-network:
+    driver: bridge

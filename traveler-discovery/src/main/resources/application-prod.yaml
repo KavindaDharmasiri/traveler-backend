@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: traveler-discovery
+  config:
+    import: optional:configserver:http://traveler-config:8888

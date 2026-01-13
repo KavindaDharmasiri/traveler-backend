@@ -252,6 +252,22 @@ public class OrderService {
         }
     }
 
+    public ResponseEntity<Map<String, Object>> getItemForTraveler2(Long itemId, String tenant) {
+        try {
+            Optional<User> userOpt = userRepository.findByTenantId(tenant);
+            ResponseEntity<ItemDTO> itemResponse = coreClient.getItem(itemId, tenant);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("item", itemResponse.getBody());
+            response.put("user", userOpt.orElse(null));
+            
+            return ResponseEntity.ok(response);
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     public ResponseEntity<String> changeStatus(String orderId, String itemId, String status, String tenant) {
         try{
             AuthUpdateStatusDTO map = new AuthUpdateStatusDTO();

@@ -5,12 +5,10 @@ spring:
     config:
       server:
         native:
-          search-locations: classpath:/config/dev/,classpath:/config/prod/
+          search-locations: classpath:/config/prod/
         git:
           uri: file:///tmp/config-repo
           default-label: main
-  profiles:
-    active: native
 
 server:
   port: 8888
@@ -19,4 +17,4 @@ management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: health,info

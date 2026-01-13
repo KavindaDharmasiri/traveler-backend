@@ -34,4 +34,8 @@ public interface ProviderItemService {
     List<ItemDetailsDTO> getItemsForTravellers();
 
     ResponseEntity<ItemDTO> getItemforTraveller(Long itemId, String tenant);
+
+    ResponseEntity<List<ItemDTO>> getItemsWithStatus(String status);
+
+    ResponseEntity<String> updateItemStatus(String status, long id);
 }

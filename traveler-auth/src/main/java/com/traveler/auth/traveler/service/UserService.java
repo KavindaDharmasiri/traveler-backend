@@ -2,15 +2,18 @@ package com.traveler.auth.traveler.service;
 
 import com.traveler.auth.traveler.dto.*;
 import com.traveler.auth.traveler.entity.User;
+import com.traveler.auth.traveler.feignClient.CoreClient;
 import com.traveler.auth.traveler.repository.UserRepository;
 import com.traveler.auth.traveler.repository.TransactionRepository;
 import com.traveler.auth.traveler.dto.ProfileUpdateDTO;
 import com.traveler.auth.traveler.utils.UserType;
+import com.traveler.common.dto.provider.ItemDTO;
 import com.traveler.common.entity.Transaction;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,11 +31,13 @@ public class UserService implements UserDetailsService {
     
     private final UserRepository userRepository;
     private final TransactionRepository transactionRepository;
+    private final CoreClient coreClient;
     private final com.traveler.auth.traveler.repository.UserDocumentRepository userDocumentRepository;
     
-    public UserService(UserRepository userRepository, TransactionRepository transactionRepository, com.traveler.auth.traveler.repository.UserDocumentRepository userDocumentRepository) {
+    public UserService(UserRepository userRepository, TransactionRepository transactionRepository, CoreClient coreClient, com.traveler.auth.traveler.repository.UserDocumentRepository userDocumentRepository) {
         this.userRepository = userRepository;
         this.transactionRepository = transactionRepository;
+        this.coreClient = coreClient;
         this.userDocumentRepository = userDocumentRepository;
     }
     
@@ -414,5 +419,42 @@ public class UserService implements UserDetailsService {
         }
         
         userRepository.save(user);
+    }
+
+    public List<ItemDTO> getItemsByStatus(String status, String userId) {
+        try {
+            if (userId != null) {
+                // Get items for specific user
+                User user = userRepository.findById(Long.parseLong(userId))
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+                return coreClient.getItemsWithStatus(status, user.getTenantId()).getBody();
+            } else {
+                // Get items for all service providers
+                List<ItemDTO> all = new ArrayList<>();
+                userRepository.findAllByIsActiveAndType(true, UserType.SERVICE_PROVIDER).forEach(user -> {
+                    List<ItemDTO> body = coreClient.getItemsWithStatus(status, user.getTenantId()).getBody();
+                    body.forEach(item -> {
+                        item.setTenant(user.getTenantId());
+                        item.setTenantName(user.getName());
+                    });
+
+                    all.addAll(body);
+                });
+                return all;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch items from core service");
+        }
+    }
+
+    public ResponseEntity<String> updateItemStatus(String tenant, String status, long id) {
+        try {
+            Map <String, String> userMap = new HashMap<>();
+            userMap.put("status", status);
+            userMap.put("id", String.valueOf(id));
+            return coreClient.updateStatusOfItem(userMap, tenant);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update item status");
+        }
     }
 }

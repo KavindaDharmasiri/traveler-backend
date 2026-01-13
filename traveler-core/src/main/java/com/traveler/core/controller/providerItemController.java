@@ -77,4 +77,17 @@ public class providerItemController {
         return providerItemService.getItemforTraveller(itemId, tenant);
     }
 
+
+    @GetMapping("/status")
+    public ResponseEntity<List<ItemDTO>> getItemsWithStatus(@RequestParam (required = false) String status) {
+        return providerItemService.getItemsWithStatus(status);
+    }
+
+    @PutMapping("status_update")
+    public ResponseEntity<String> updateItemStatus(@RequestBody Map<String, Object> statusMap) {
+        String status = (String) statusMap.get("status");
+        Long id = Long.valueOf(statusMap.get("id").toString());
+        return providerItemService.updateItemStatus( status, id);
+    }
+
 }

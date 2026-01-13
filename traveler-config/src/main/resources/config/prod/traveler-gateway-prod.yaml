@@ -1,0 +1,61 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: traveler-auth
+          uri: lb://traveler-auth
+          predicates:
+            - Path=/auth/**
+        - id: traveler-auth-service
+          uri: lb://traveler-auth
+          predicates:
+            - Path=/auth-service/**
+        - id: traveler-storage
+          uri: lb://traveler-storage
+          predicates:
+            - Path=/storage/**
+          filters:
+            - StripPrefix=1
+        - id: traveler-core
+          uri: lb://traveler-core
+          predicates:
+            - Path=/core/**
+          filters:
+            - StripPrefix=1
+        - id: traveler-notification
+          uri: lb://traveler-notification
+          predicates:
+            - Path=/notification/**
+          filters:
+            - StripPrefix=1
+        - id: traveler-payment
+          uri: lb://traveler-payment
+          predicates:
+            - Path=/payment/**
+          filters:
+            - StripPrefix=1
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+server:
+  port: 5555
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://traveler-discovery:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized

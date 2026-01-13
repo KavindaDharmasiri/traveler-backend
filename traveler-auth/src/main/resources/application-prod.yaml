@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: traveler-auth
+  config:
+    import: optional:configserver:http://traveler-config:8888
+  datasource:
+    url: jdbc:mysql://mysql:3306/traveler_auth?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
