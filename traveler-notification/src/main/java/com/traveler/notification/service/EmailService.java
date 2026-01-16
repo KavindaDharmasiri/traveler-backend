@@ -57,8 +57,8 @@ public class EmailService {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             
-            helper.setFrom(fromEmail);
-            helper.setTo(email);
+            helper.setFrom("travlerofficial2025@gmail.com");
+            helper.setTo(email.trim());
             helper.setSubject("Traveler - Email Verification");
             
             String htmlContent = buildVerificationEmailHtml(verificationCode);
@@ -68,6 +68,7 @@ public class EmailService {
             log.info("Email verification sent successfully to {}", email);
         } catch (Exception e) {
             log.error("Error sending email verification to {}: {}", email, e.getMessage());
+            e.printStackTrace();
             throw new RuntimeException("Failed to send email verification", e);
         }
     }
