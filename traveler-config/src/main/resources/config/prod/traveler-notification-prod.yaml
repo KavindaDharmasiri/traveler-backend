@@ -54,7 +54,7 @@ management:
 
 twilio:
   account:
-    sid:  ACd491f7c737d419707ca232960dea9a0c
+    sid: ACd491f7c737d419707ca232960dea9a0c
   auth:
     token: 6852f8a3ad56065062788d8167cf0936
   whatsapp:
