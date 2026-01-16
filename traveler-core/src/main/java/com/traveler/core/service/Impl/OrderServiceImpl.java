@@ -160,13 +160,14 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public ResponseEntity<Map<String, Map<String, List<OrderDTO>>>> findAllOrders() {
         try {
+            System.out.println("/////////////////////////////////////////////////////");
             removeold();
             String currentTenant = TenantContext.getCurrentTenant();
             var currentUser = authClient.getUserByTenant(currentTenant);
             boolean isServiceProvider = "SERVICE_PROVIDER".equals(currentUser.getType());
 
             List<Order> orders = orderRepository.findAllByStatusNot(STATUS.DELETED);
-            Map<String, Map<String, List<OrderDTO>>> groupedOrders = new HashMap<>();
+            Map<String, List<OrderDTO>> groupedOrders = new HashMap<>();
             
             for (Order order : orders) {
                 List<OrderItems> orderItems = orderItemsRepository.findByOrderId(order.getId());
@@ -196,8 +197,7 @@ public class OrderServiceImpl implements OrderService {
                         orderDTO.setGroupTenant(groupTenant);
                         orderDTO.setGroupName(groupName);
 
-                        groupedOrders.computeIfAbsent(order.getOrderCode(), k -> new HashMap<>())
-                                .computeIfAbsent(groupTenant, k -> new ArrayList<>())
+                        groupedOrders.computeIfAbsent(order.getOrderCode(), k -> new ArrayList<>())
                                 .add(orderDTO);
                     }
                 }
