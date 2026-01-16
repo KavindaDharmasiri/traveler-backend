@@ -5,6 +5,7 @@ import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import jakarta.annotation.PostConstruct;
 
 /**
  * ALL RIGHT RESERVED By kavinda_d
@@ -25,19 +26,17 @@ public class TwilioService {
     @Value("${twilio.whatsapp.number}")
     private String fromWhatsAppNumber;
 
-    public TwilioService() {
-        // Initialize Twilio with account credentials
+    @PostConstruct
+    public void init() {
         Twilio.init(accountSid, authToken);
     }
 
     public String sendWhatsAppMessage(String to, String messageBody) {
-        // Send a message via Twilio's API
         Message message = Message.creator(
-                        new PhoneNumber("whatsapp:" + to),   // Recipient's WhatsApp number
-                        new PhoneNumber(fromWhatsAppNumber), // Twilio WhatsApp number
-                        messageBody)                         // Message body
+                        new PhoneNumber("whatsapp:" + to),
+                        new PhoneNumber(fromWhatsAppNumber),
+                        messageBody)
                 .create();
-
-        return message.getSid(); // Return message SID to track status
+        return message.getSid();
     }
 }

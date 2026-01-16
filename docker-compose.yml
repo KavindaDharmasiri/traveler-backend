@@ -133,6 +133,9 @@ services:
       - traveler-network
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
+      - TWILIO_WHATSAPP_NUMBER=${TWILIO_WHATSAPP_NUMBER}
 
   traveler-payment:
     build:
