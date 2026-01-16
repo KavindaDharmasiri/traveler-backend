@@ -66,6 +66,20 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+			<!-- Spring Web -->
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-web</artifactId>
+			</dependency>
+
+			<!-- Twilio API dependency -->
+			<dependency>
+				<groupId>com.twilio.sdk</groupId>
+				<artifactId>twilio</artifactId>
+				<version>9.0.0</version>
+			</dependency>
+
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>

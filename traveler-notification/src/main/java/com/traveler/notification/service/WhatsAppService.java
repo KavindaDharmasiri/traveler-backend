@@ -24,6 +24,7 @@ public class WhatsAppService {
 
     private final PhoneVerificationRepository phoneVerificationRepository;
     private final AuthClient authClient;
+    private final TwilioService twilioService;
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Value("${whatsapp.api.url:https://graph.facebook.com/v18.0}")
@@ -36,7 +37,7 @@ public class WhatsAppService {
     private String accessToken;
 
     @Transactional
-    public void sendVerificationCode(String userTenant, String phoneNumber) {
+    public String sendVerificationCode(String userTenant, String phoneNumber) {
         // Clean up any existing verification for this user/phone
         phoneVerificationRepository.deleteByUserTenantAndPhoneNumber(userTenant, phoneNumber);
 
@@ -53,6 +54,7 @@ public class WhatsAppService {
         System.out.println(pin);
         // Send WhatsApp message
 //        sendWhatsAppMessage(phoneNumber, pin);
+        return twilioService.sendWhatsAppMessage(phoneNumber, pin);
     }
 
     private void sendWhatsAppMessage(String phoneNumber, String pin) {

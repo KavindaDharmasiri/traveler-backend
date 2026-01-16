@@ -50,3 +50,12 @@ management:
     web:
       exposure:
         include: health,info,metrics
+
+
+twilio:
+  account:
+    sid:  ACd491f7c737d419707ca232960dea9a0c
+  auth:
+    token: 6852f8a3ad56065062788d8167cf0936
+  whatsapp:
+    number: whatsapp:+14155238886
