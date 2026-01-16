@@ -54,8 +54,8 @@ management:
 
 twilio:
   account:
-    sid: ${TWILIO_ACCOUNT_SID}
+    sid:  ACd491f7c737d419707ca232960dea9a0c
   auth:
-    token: ${TWILIO_AUTH_TOKEN}
+    token: 6852f8a3ad56065062788d8167cf0936
   whatsapp:
-    number: ${TWILIO_WHATSAPP_NUMBER}
+    number: whatsapp:+14155238886
