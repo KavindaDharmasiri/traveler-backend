@@ -162,12 +162,10 @@ public class OrderServiceImpl implements OrderService {
         try {
             removeold();
             String currentTenant = TenantContext.getCurrentTenant();
-            System.out.println("Current tenant: " + currentTenant);
             var currentUser = authClient.getUserByTenant(currentTenant);
             boolean isServiceProvider = "SERVICE_PROVIDER".equals(currentUser.getType());
 
             List<Order> orders = orderRepository.findAllByStatusNot(STATUS.DELETED);
-            
             Map<String, Map<String, List<OrderDTO>>> groupedOrders = new HashMap<>();
             
             for (Order order : orders) {
@@ -198,8 +196,8 @@ public class OrderServiceImpl implements OrderService {
                         orderDTO.setGroupTenant(groupTenant);
                         orderDTO.setGroupName(groupName);
 
-                        groupedOrders.computeIfAbsent(groupTenant, k -> new HashMap<>())
-                                .computeIfAbsent(groupName, k -> new ArrayList<>())
+                        groupedOrders.computeIfAbsent(order.getOrderCode(), k -> new HashMap<>())
+                                .computeIfAbsent(groupTenant, k -> new ArrayList<>())
                                 .add(orderDTO);
                     }
                 }
