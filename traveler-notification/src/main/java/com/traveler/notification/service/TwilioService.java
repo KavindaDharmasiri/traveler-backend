@@ -17,14 +17,14 @@ import jakarta.annotation.PostConstruct;
 @Service
 public class TwilioService {
 
-    @Value("${twilio.account.sid}")
-    private String accountSid;
+//    @Value("${twilio.account.sid}")
+    private String accountSid = "ACd491f7c737d419707ca232960dea9a0c";
 
-    @Value("${twilio.auth.token}")
-    private String authToken;
+//    @Value("${twilio.auth.token}")
+    private String authToken = "6852f8a3ad56065062788d8167cf0936";
 
-    @Value("${twilio.whatsapp.number}")
-    private String fromWhatsAppNumber;
+//    @Value("${twilio.whatsapp.number}")
+    private String fromWhatsAppNumber = "+14155238886";
 
     @PostConstruct
     public void init() {
