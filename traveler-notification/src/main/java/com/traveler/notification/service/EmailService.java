@@ -57,7 +57,7 @@ public class EmailService {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             
-            helper.setFrom("travlerofficial2025@gmail.com");
+            helper.setFrom(fromEmail != null && !fromEmail.trim().isEmpty() ? fromEmail.trim() : "travlerofficial2025@gmail.com");
             helper.setTo(email.trim());
             helper.setSubject("Traveler - Email Verification");
             
