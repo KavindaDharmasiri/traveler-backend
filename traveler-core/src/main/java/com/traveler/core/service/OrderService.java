@@ -22,7 +22,7 @@ public interface OrderService {
 
     ResponseEntity<String> createOrderWithSup(List<OrderDTO> orderDTOs);
 
-    ResponseEntity<Map<String, Map<String, List<OrderDTO>>>> findAllOrders();
+    ResponseEntity<Map<String, List<OrderDTO>>> findAllOrders();
 
     ResponseEntity<OrderDTO> findOrder(Long orderId);
 

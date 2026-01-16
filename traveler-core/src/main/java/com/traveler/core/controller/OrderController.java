@@ -31,7 +31,7 @@ public class OrderController {
     }
 
     @GetMapping()
-    public ResponseEntity<Map<String, Map<String, List<OrderDTO>>>> getOrders() {
+    public ResponseEntity<Map<String, List<OrderDTO>>> getOrders() {
         return orderService.findAllOrders();
     }
 

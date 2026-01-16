@@ -158,7 +158,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional
     @Override
-    public ResponseEntity<Map<String, Map<String, List<OrderDTO>>>> findAllOrders() {
+    public ResponseEntity<Map<String, List<OrderDTO>>> findAllOrders() {
         try {
             System.out.println("/////////////////////////////////////////////////////");
             removeold();
