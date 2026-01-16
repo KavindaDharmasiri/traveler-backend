@@ -28,15 +28,26 @@ public class TwilioService {
 
     @PostConstruct
     public void init() {
+        System.out.println("Initializing Twilio with SID: " + accountSid);
+        if (accountSid == null || accountSid.isEmpty() || authToken == null || authToken.isEmpty()) {
+            throw new IllegalStateException("Twilio credentials not configured. SID: " + accountSid + ", Token: " + (authToken != null ? "[SET]" : "[NULL]"));
+        }
         Twilio.init(accountSid, authToken);
+        System.out.println("Twilio initialized successfully");
     }
 
     public String sendWhatsAppMessage(String to, String messageBody) {
-        Message message = Message.creator(
-                        new PhoneNumber("whatsapp:" + to),
-                        new PhoneNumber(fromWhatsAppNumber),
-                        messageBody)
-                .create();
-        return message.getSid();
+        try {
+            Message message = Message.creator(
+                            new PhoneNumber("whatsapp:" + to),
+                            new PhoneNumber(fromWhatsAppNumber),
+                            messageBody)
+                    .create();
+            return message.getSid();
+        }catch (Exception e){
+            System.err.println("Error sending WhatsApp message: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 }
