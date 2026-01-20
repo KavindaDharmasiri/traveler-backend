@@ -40,8 +40,6 @@ public class RegisterRequest {
     private String nicImageUuid;
     private String nicBackUuid;
     @NotBlank
-    @Pattern(regexp = "^https://maps\\.google\\.com/.*|^https://www\\.google\\.com/maps/.*|^https://goo\\.gl/maps/.*$", 
-             message = "Please provide a valid Google Maps link")
     private String googleMapsUrl;
 
     @NotNull
