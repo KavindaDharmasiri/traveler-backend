@@ -39,7 +39,6 @@ public class RegisterRequest {
     
     private String nicImageUuid;
     private String nicBackUuid;
-    @NotBlank
     private String googleMapsUrl;
 
     @NotNull
