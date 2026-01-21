@@ -78,13 +78,15 @@ public class AuthService {
         user.setGoogleMapsUrl(request.getGoogleMapsUrl());
         user.setIsNumberVerified(false);
 
-        Address address = new Address();
-        address.setStreet1(request.getAddress().getStreet1());
-        address.setStreet2(request.getAddress().getStreet2());
-        address.setCity(request.getAddress().getCity());
-        address.setState(request.getAddress().getState());
-        address.setPostalCode(request.getAddress().getPostalCode());
-        user.setAddress(address);
+        if (request.getAddress() != null) {
+            Address address = new Address();
+            address.setStreet1(request.getAddress().getStreet1());
+            address.setStreet2(request.getAddress().getStreet2());
+            address.setCity(request.getAddress().getCity());
+            address.setState(request.getAddress().getState());
+            address.setPostalCode(request.getAddress().getPostalCode());
+            user.setAddress(address);
+        }
         
         if (request.getBankDetails() != null) {
             BankDetails bankDetails = new BankDetails();
