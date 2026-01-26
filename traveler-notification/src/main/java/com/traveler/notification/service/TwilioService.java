@@ -24,7 +24,7 @@ public class TwilioService {
     private String authToken = "6852f8a3ad56065062788d8167cf0936";
 
 //    @Value("${twilio.whatsapp.number}")
-    private String fromWhatsAppNumber = "+14155238886";
+    private String fromWhatsAppNumber = "whatsapp:+14155238886";
 
     @PostConstruct
     public void init() {

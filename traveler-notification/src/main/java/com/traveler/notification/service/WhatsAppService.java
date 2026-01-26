@@ -24,7 +24,6 @@ public class WhatsAppService {
 
     private final PhoneVerificationRepository phoneVerificationRepository;
     private final AuthClient authClient;
-    private final TwilioService twilioService;
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Value("${whatsapp.api.url:https://graph.facebook.com/v18.0}")
@@ -46,18 +45,19 @@ public class WhatsAppService {
 
         // Save verification record
         PhoneVerification verification = new PhoneVerification();
-        verification.setUserId(userTenant); // Using tenant as user ID for now
+        verification.setUserId(userTenant);
         verification.setUserTenant(userTenant);
         verification.setPhoneNumber(phoneNumber);
         verification.setPin(pin);
         phoneVerificationRepository.save(verification);
-        System.out.println(pin);
-        // Send WhatsApp message
-//        sendWhatsAppMessage(phoneNumber, pin);
-        return twilioService.sendWhatsAppMessage(phoneNumber, pin);
+        
+        log.info("Generated PIN for {}: {}", phoneNumber, pin);
+        
+        // Send WhatsApp message using Facebook API
+        return sendWhatsAppMessage(phoneNumber, pin);
     }
 
-    private void sendWhatsAppMessage(String phoneNumber, String pin) {
+    private String sendWhatsAppMessage(String phoneNumber, String pin) {
         try {
             String url = whatsappApiUrl + "/" + phoneNumberId + "/messages";
             
@@ -80,9 +80,11 @@ public class WhatsAppService {
             
             if (response.getStatusCode().is2xxSuccessful()) {
                 log.info("WhatsApp message sent successfully to {}", phoneNumber);
+                return "WhatsApp message sent successfully";
             } else {
                 log.error("Failed to send WhatsApp message. Status: {}, Response: {}", 
                          response.getStatusCode(), response.getBody());
+                throw new RuntimeException("Failed to send WhatsApp message: " + response.getBody());
             }
         } catch (Exception e) {
             log.error("Error sending WhatsApp message to {}: {}", phoneNumber, e.getMessage());
