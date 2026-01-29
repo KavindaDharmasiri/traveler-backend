@@ -39,6 +39,9 @@ public class Item {
 
     @Column(name = "price_per_day")
     private double pricePerDay;
+
+    @Column(name = "advance")
+    private double advance;
     
     @Column(name = "overall_rating")
     private Double overallRating = 0.0;
@@ -182,5 +185,13 @@ public class Item {
 
     public void setQty(int qty) {
         this.qty = qty;
+    }
+
+    public double getAdvance() {
+        return advance;
+    }
+
+    public void setAdvance(double advance) {
+        this.advance = advance;
     }
 }

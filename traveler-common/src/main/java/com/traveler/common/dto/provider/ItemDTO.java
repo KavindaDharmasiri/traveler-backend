@@ -28,6 +28,7 @@ public class ItemDTO {
     private STATUS status;
     private List<String> images;
     private double pricePerDay;
+    private double advance;
     private VehicleDetailsDTO vehicleDetails;
     private HotelDetailsDTO hotelDetails;
     private Double OverallRating;

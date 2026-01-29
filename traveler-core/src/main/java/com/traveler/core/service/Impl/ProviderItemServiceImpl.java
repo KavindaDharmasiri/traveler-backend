@@ -48,6 +48,7 @@ public class ProviderItemServiceImpl implements ProviderItemService {
             item.setContact(itemDTO.getContact() != null ? itemDTO.getContact() : "N/A");
             item.setDescription(itemDTO.getDescription() != null ? itemDTO.getDescription() : "No description");
             item.setPricePerDay(itemDTO.getPricePerDay() > 0 ? itemDTO.getPricePerDay() : 1.0);
+            item.setAdvance(itemDTO.getAdvance() > 0 ? itemDTO.getAdvance() : 1.0);
             item.setQty(itemDTO.getQty() > 0 ? itemDTO.getQty() : 1);
             String imgList = itemDTO.getImages() != null ? String.join(",", itemDTO.getImages()) : "";
             item.setImages(imgList);
@@ -93,6 +94,7 @@ public class ProviderItemServiceImpl implements ProviderItemService {
             item.setContact(itemDTO.getContact());
             item.setDescription(itemDTO.getDescription());
             item.setPricePerDay(itemDTO.getPricePerDay());
+            item.setAdvance(itemDTO.getAdvance());
             String imgList = String.join(",", itemDTO.getImages());
             item.setImages(imgList);
             item.setStatus(STATUS.INACTIVE);
@@ -223,6 +225,7 @@ public class ProviderItemServiceImpl implements ProviderItemService {
         dto.setContact(item.getContact());
         dto.setDescription(item.getDescription());
         dto.setPricePerDay(item.getPricePerDay());
+        dto.setAdvance(item.getAdvance());
         dto.setStatus(item.getStatus());
         dto.setCurrency(item.getCurrency());
         dto.setOverallRating(item.getOverallRating());
@@ -278,6 +281,7 @@ public class ProviderItemServiceImpl implements ProviderItemService {
         dto.setContact(item.getContact());
         dto.setDescription(item.getDescription());
         dto.setPricePerDay(item.getPricePerDay());
+        dto.setAdvance(item.getAdvance());
         dto.setOverallRating(item.getOverallRating());
         dto.setStatus(item.getStatus());
         dto.setCurrency(item.getCurrency());
