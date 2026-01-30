@@ -53,12 +53,12 @@ management:
 
 whatsapp:
   api:
-    url: https://graph.facebook.com/v18.0
+    url: https://graph.facebook.com/v22.0
   phone:
     number:
       id: 941950635672547
   access:
-    token: EAAVdnK4OwOkBQmHOuOz5Wh1ZCcMkB3hD31LT17WWUzuP2cPPKLrCwPPmbD1duSgGtLYxgqnVbJSYV6y2hKZCDARRAhtLoi25WcfUzpU01wRuGM51BUi5SrvPxgLK0Ge8noR2czmgmZBHMNZBLq1WoHIgEkkayJEXgbx7hU39ksqZABM4JyeKXiVSkfHmBLEgYxZAatDMJZB52OOab7jUVyXKw3PzjmZBanLV29TySxbWrDnP84xIbq4wU30kVABezcLnErZBt1ZACiUlrkEbkcVpvC
+    token: EAAMTtaoZCQ4sBQiLpzxwCNddAXIu3PzbhzPsJZC63uTnj1bQ91CCd2oVYUiYMDQzl4uqvGVzJvf94wKC3GGbbMs2bMzPxpZAsvdN8kCaWdZBWaf8Fe1DMQsIOYyjMLBOrXDPbhHhlBuOIz9gLqVHAVSjZCZAQPOUapD69e4UPg8fZCLhpozMJHAxihYWQd1IQZDZD
 
 twilio:
   account:
