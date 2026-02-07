@@ -38,17 +38,19 @@ services:
     ports:
       - "8761:8761"
     depends_on:
-      - traveler-config
+      traveler-config:
+        condition: service_healthy
     networks:
       - traveler-network
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+      - JAVA_OPTS=-Xms256m -Xmx512m
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8761/actuator/health"]
-      interval: 30s
+      interval: 15s
       timeout: 10s
-      retries: 3
-      start_period: 40s
+      retries: 10
+      start_period: 60s
 
   traveler-gateway:
     build:

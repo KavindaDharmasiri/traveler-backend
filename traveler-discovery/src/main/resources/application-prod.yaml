@@ -6,14 +6,31 @@ spring:
   cloud:
     config:
       fail-fast: false
+      retry:
+        initial-interval: 2000
+        max-attempts: 10
+        max-interval: 3000
 
 eureka:
   client:
     register-with-eureka: false
     fetch-registry: false
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
   instance:
     hostname: traveler-discovery
-    prefer-ip-address: false
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
 
 server:
   port: 8761
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
