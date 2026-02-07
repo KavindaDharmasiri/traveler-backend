@@ -43,6 +43,12 @@ services:
       - traveler-network
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8761/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   traveler-gateway:
     build:
