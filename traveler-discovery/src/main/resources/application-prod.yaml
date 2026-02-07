@@ -3,3 +3,17 @@ spring:
     name: traveler-discovery
   config:
     import: optional:configserver:http://traveler-config:8888
+  cloud:
+    config:
+      fail-fast: false
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+  instance:
+    hostname: traveler-discovery
+    prefer-ip-address: false
+
+server:
+  port: 8761
